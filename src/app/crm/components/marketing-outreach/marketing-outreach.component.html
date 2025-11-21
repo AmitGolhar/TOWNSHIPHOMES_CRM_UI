@@ -33,7 +33,7 @@
       <td>{{ task.taskType }}</td>
       <td>{{ task.campaignName }}</td>
       <td>{{ task.platform }}</td>
-      <td>{{ task.assignedTo }}</td>
+      <td>{{ employeeMap[task.assignedTo] || '-' }}</td>
       <td>
         <span class="badge" [ngClass]="{
                 'bg-warning': task.status === 'Pending',
@@ -119,7 +119,19 @@
 
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" (click)="saveTask()">{{ isEditing ? 'Update' : 'Save' }}</button>
+        <button class="btn btn-primary" (click)="saveTask()" [disabled]="isSaving">
+
+          <span *ngIf="!isSaving">
+            {{ isEditing ? 'Update' : 'Save' }}
+          </span>
+
+          <span *ngIf="isSaving">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Processing...
+          </span>
+
+        </button>
+
       </div>
     </div>
   </div>

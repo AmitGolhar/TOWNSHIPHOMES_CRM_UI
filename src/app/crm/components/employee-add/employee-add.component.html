@@ -2,106 +2,252 @@
 
     <!-- Full Name -->
     <div class="col-md-6">
-        <label class="form-label">
-            Full Name <span style="color:red">*</span>
-        </label>
+        <label class="form-label">Full Name <span style="color:red">*</span></label>
         <input type="text" class="form-control" name="name"
-               [(ngModel)]="employee.name"
-               placeholder="Enter employee name" required />
+               [(ngModel)]="employee.name" placeholder="Enter employee name" required />
     </div>
 
     <!-- Company Email -->
     <div class="col-md-6">
-        <label class="form-label">
-            Company Email (Login Username) <span style="color:red">*</span>
-        </label>
+        <label class="form-label">Company Email (Login Username) <span style="color:red">*</span></label>
         <input type="email" class="form-control" name="companyEmail"
-               [(ngModel)]="employee.companyEmail"
-               placeholder="name@townshiphomes.in" required />
+               [(ngModel)]="employee.companyEmail" placeholder="name@townshiphomes.in" required />
     </div>
 
-    <!-- Personal Gmail ID -->
+    <!-- Personal Gmail -->
     <div class="col-md-6">
-        <label class="form-label">
-            Personal Gmail ID (For Welcome Email) <span style="color:red">*</span>
-        </label>
+        <label class="form-label">Personal Gmail ID <span style="color:red">*</span></label>
         <input type="email" class="form-control" name="gmailId"
-               [(ngModel)]="employee.email"
-               placeholder="example@gmail.com" required />
+               [(ngModel)]="employee.email" placeholder="example@gmail.com" required />
     </div>
 
     <!-- Phone -->
     <div class="col-md-6">
-        <label class="form-label">
-            Phone <span style="color:red">*</span>
-        </label>
+        <label class="form-label">Phone <span style="color:red">*</span></label>
         <input type="text" class="form-control" name="phone"
-               [(ngModel)]="employee.phone"
-               placeholder="Enter phone number" required />
+               [(ngModel)]="employee.phone" placeholder="Enter phone number" required />
     </div>
 
     <!-- Department -->
     <div class="col-md-6">
-        <label class="form-label">
-            Department <span style="color:red">*</span>
-        </label>
+        <label class="form-label">Department <span style="color:red">*</span></label>
         <select class="form-select" name="department" [(ngModel)]="employee.department" required>
             <option value="">Select...</option>
-
-            <!-- Core Business -->
             <option value="SALES">Sales</option>
             <option value="MARKETING">Marketing</option>
             <option value="CRM_SUPPORT">CRM / Customer Support</option>
             <option value="BUSINESS_DEVELOPMENT">Business Development</option>
-
-            <!-- Property & Project -->
             <option value="PROPERTY_MANAGEMENT">Property Management</option>
             <option value="FACILITY_MANAGEMENT">Facility Management</option>
             <option value="OPERATIONS">Operations</option>
             <option value="PROJECT_MANAGEMENT">Project Management</option>
             <option value="SITE_MANAGEMENT">Site Management</option>
-
-            <!-- Finance & Legal -->
             <option value="FINANCE">Finance</option>
             <option value="ACCOUNTS">Accounts</option>
             <option value="LEGAL">Legal</option>
             <option value="COMPLIANCE">Compliance</option>
-
-            <!-- Tech -->
             <option value="ELECTRICAL">Electrical</option>
             <option value="INTERIOR_DESIGN">Interior Design</option>
             <option value="HR">Human Resources (HR)</option>
             <option value="ADMIN">Admin</option>
             <option value="IT_TECH">IT / Tech</option>
             <option value="QUALITY_ASSURANCE">Quality Assurance (QA)</option>
-
-            <!-- Data -->
             <option value="MARKET_RESEARCH">Market Research</option>
             <option value="DATA_ANALYTICS">Data Analytics</option>
             <option value="STRATEGY_PLANNING">Strategy & Planning</option>
-
-            <!-- Broker -->
             <option value="BROKER_RELATIONS">Broker Relations</option>
             <option value="CHANNEL_PARTNER_MANAGEMENT">Channel Partner Management</option>
-
-            <!-- Developer -->
             <option value="DEVELOPER_RELATIONS">Developer Relations</option>
         </select>
     </div>
 
+    <!-- ROLES CHECKBOX SECTION -->
+    <div class="col-12">
+        <!-- SEND EMAIL CHECKBOX -->
+ 
+
+        <label class="form-label fw-semibold">Employee Roles <span style="color:red">*</span></label>
+
+        <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+
+            <!-- SALES -->
+            <h6 class="fw-bold text-primary">Sales & Marketing</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.sales">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OPERATIONS -->
+            <h6 class="fw-bold text-primary mt-3">Operations & CRM</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.operations">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEGAL -->
+            <h6 class="fw-bold text-primary mt-3">Legal & Documentation</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.legal">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINANCE -->
+            <h6 class="fw-bold text-primary mt-3">Finance & Accounts</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.finance">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LISTING -->
+            <h6 class="fw-bold text-primary mt-3">Property Listing & Data</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.listing">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONSTRUCTION -->
+            <h6 class="fw-bold text-primary mt-3">Construction & Project</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.construction">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FACILITY -->
+            <h6 class="fw-bold text-primary mt-3">Facility Management</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.facility">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AFTER SALES -->
+            <h6 class="fw-bold text-primary mt-3">After-Sales & Customer Experience</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.afterSales">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMMERCIAL -->
+            <h6 class="fw-bold text-primary mt-3">Commercial Real Estate</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.commercial">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BROKERAGE -->
+            <h6 class="fw-bold text-primary mt-3">Brokerage / Channel Partner</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.brokerage">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MANAGEMENT -->
+            <h6 class="fw-bold text-primary mt-3">Top Management</h6>
+            <div class="row mb-2">
+                <div class="col-6" *ngFor="let role of roleGroups.management">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input"
+                               [checked]="selectedRoles.includes(role)"
+                               (change)="toggleRole(role, $event)" />
+                        <label class="form-check-label small">{{ role }}</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- EMAIL SEND CHECKBOX -->
+    <div class="col-12 mt-3">
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input"
+                   id="sendEmailToggle"
+                   [(ngModel)]="sendSimpleEmail"
+                   name="sendSimpleEmail" />
+            <label class="form-check-label" for="sendEmailToggle">
+                ✉️ Send Welcome Email With Login Credentials
+            </label>
+        </div>
+    </div>
+
     <!-- Joining Date -->
     <div class="col-md-6">
-        <label class="form-label">
-            Joining Date <span style="color:red">*</span>
-        </label>
+        <label class="form-label">Joining Date <span style="color:red">*</span></label>
         <input type="date" class="form-control" name="joiningDate"
                [(ngModel)]="employee.joiningDate" required />
     </div>
 
     <!-- Submit -->
     <div class="col-12 mt-3">
-        <button class="btn btn-primary w-100" type="submit" [disabled]="empForm.invalid">
-            ➕ Add Employee (User Will Be Auto-Created)
+        <button class="btn btn-primary w-100"
+                type="submit"
+                [disabled]="empForm.invalid || isSubmitting">
+
+            <span *ngIf="!isSubmitting">➕ Add Employee (User Will Be Auto-Created)</span>
+
+            <span *ngIf="isSubmitting">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Processing...
+            </span>
         </button>
     </div>
 

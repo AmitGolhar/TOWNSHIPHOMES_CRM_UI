@@ -4,8 +4,7 @@
 </div>
 
 <div class="mb-3">
-  <input type="text" class="form-control" placeholder="Search by task type or trigger..."
-         [(ngModel)]="searchText">
+  <input type="text" class="form-control" placeholder="Search by task type or trigger..." [(ngModel)]="searchText">
 </div>
 
 <div *ngIf="isLoading" class="text-center text-muted p-3">
@@ -34,10 +33,9 @@
       <td>{{ task.taskType }}</td>
       <td>{{ task.triggerSource }}</td>
       <td>{{ task.automationType }}</td>
-      <td>{{ task.assignedTo }}</td>
+      <td>{{ employeeMap[task.assignedTo] || '-' }}</td>
       <td>
-        <span class="badge"
-              [ngClass]="{
+        <span class="badge" [ngClass]="{
                 'bg-warning': task.status === 'Pending',
                 'bg-info': task.status === 'Triggered',
                 'bg-success': task.status === 'Executed',
@@ -128,9 +126,19 @@
 
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" (click)="saveTask()">
-          {{ isEditing ? 'Update' : 'Save' }}
+        <button class="btn btn-primary" (click)="saveTask()" [disabled]="isSaving">
+
+          <span *ngIf="!isSaving">
+            {{ isEditing ? 'Update' : 'Save' }}
+          </span>
+
+          <span *ngIf="isSaving">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Processing...
+          </span>
+
         </button>
+
       </div>
     </div>
   </div>

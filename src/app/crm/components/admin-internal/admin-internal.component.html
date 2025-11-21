@@ -4,8 +4,7 @@
 </div>
 
 <div class="mb-3">
-  <input type="text" class="form-control" placeholder="Search by department or assigned to..."
-         [(ngModel)]="searchText">
+  <input type="text" class="form-control" placeholder="Search by department or assigned to..." [(ngModel)]="searchText">
 </div>
 
 <div *ngIf="isLoading" class="text-center text-muted p-3">
@@ -33,10 +32,9 @@
       <td>{{ i + 1 }}</td>
       <td>{{ task.taskType }}</td>
       <td>{{ task.department }}</td>
-      <td>{{ task.assignedTo }}</td>
+      <td>{{ employeeMap[task.assignedTo] || '-' }}</td>
       <td>
-        <span class="badge"
-              [ngClass]="{
+        <span class="badge" [ngClass]="{
                 'bg-danger': task.priority === 'High',
                 'bg-warning': task.priority === 'Medium',
                 'bg-secondary': task.priority === 'Low'
@@ -45,8 +43,7 @@
         </span>
       </td>
       <td>
-        <span class="badge"
-              [ngClass]="{
+        <span class="badge" [ngClass]="{
                 'bg-warning': task.status === 'Pending',
                 'bg-info': task.status === 'In Progress',
                 'bg-success': task.status === 'Completed'
@@ -131,7 +128,17 @@
 
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" (click)="saveTask()">{{ isEditing ? 'Update' : 'Save' }}</button>
+        <button class="btn btn-primary" (click)="saveTask()" [disabled]="isSaving">
+
+          <span *ngIf="!isSaving">{{ isEditing ? 'Update' : 'Save' }}</span>
+
+          <span *ngIf="isSaving">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Processing...
+          </span>
+
+        </button>
+
       </div>
     </div>
   </div>

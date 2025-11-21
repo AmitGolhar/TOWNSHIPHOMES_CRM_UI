@@ -19,6 +19,8 @@ export class LegalDocumentationComponent implements OnInit {
   isEditing = false;
   isLoading = false;
   errorMessage = '';
+isSaving = false;
+employeeMap: any = {}; // 🔥 employee map added
 
   employees: Employee[] = []; // ⬅️ EMPLOYEE LIST
 
@@ -45,24 +47,66 @@ export class LegalDocumentationComponent implements OnInit {
     this.loadEmployees(); // ⬅️ LOAD EMPLOYEES
   }
 
-  loadEmployees(): void {
-    this.employeeService.getAllEmployees().subscribe({
-      next: (res) => (this.employees = res),
-      error: (err) => console.error('Error loading employees:', err),
-    });
-  }
+ loadEmployees(): void {
+  this.employeeService.getAllEmployees().subscribe({
+    next: (res) => {
+      this.employees = res || [];
 
-  loadTasks(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.legalService
-      .getAll()
-      .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe({
-        next: (tasks) => (this.legalTasks = tasks),
-        error: () => (this.errorMessage = '⚠️ Failed to load legal tasks.'),
+      // 🔥 Create ID → Name map (same as marketing)
+      this.employeeMap = {};
+      this.employees.forEach(emp => {
+        this.employeeMap[String(emp.id)] = emp.name;
       });
-  }
+    },
+    error: (err) => console.error('Error loading employees:', err),
+  });
+}
+
+
+loadTasks(): void {
+  this.isLoading = true;
+  this.errorMessage = '';
+
+  this.legalService
+    .getAll()
+    .pipe(finalize(() => (this.isLoading = false)))
+    .subscribe({
+      next: (tasks) => {
+
+        // 🔥 Normalize AssignedTo on ALL tasks
+        this.legalTasks = tasks.map(t => {
+
+          // If backend returns the employee object
+        // If backend returns an employee object { id, name }
+if (
+  t.assignedTo &&
+  typeof t.assignedTo === "object" &&
+  "id" in t.assignedTo
+) {
+  return { ...t, assignedTo: String((t.assignedTo as any).id) };
+}
+
+
+          // If backend returns employee name instead of ID
+          const match = this.employees.find(
+            e => e.name === t.assignedTo
+          );
+
+          if (match) {
+            return { ...t, assignedTo: String(match.id) };
+          }
+
+          // Else leave as-is
+          return t;
+        });
+
+      },
+      error: () => {
+        this.errorMessage = '⚠️ Failed to load legal tasks.';
+      }
+    });
+}
+
 
   openAddModal(): void {
     this.isEditing = false;
@@ -75,40 +119,48 @@ export class LegalDocumentationComponent implements OnInit {
     this.selectedTask = { ...task };
     new bootstrap.Modal(document.getElementById('legalModal')).show();
   }
+saveTask(): void {
 
-  saveTask(): void {
-    const modalEl = document.getElementById('legalModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
+  if (this.isSaving) return; // ⛔ Prevent double-click
+  this.isSaving = true;
 
-    // 🔥 Ensure assignedTo = employeeId, not email
-    const assignedEmployee = this.employees.find(
-      (e) => String(e.id) === String(this.selectedTask.assignedTo)
-    );
+  const modalEl = document.getElementById('legalModal');
+  const modal = bootstrap.Modal.getInstance(modalEl);
 
-    const payload = {
-      ...this.selectedTask,
-      assignedTo: assignedEmployee
-        ? String(assignedEmployee.id)
-        : this.selectedTask.assignedTo,
-    };
+  // 🔥 Ensure assignedTo = employeeId
+  const assignedEmployee = this.employees.find(
+    (e) => String(e.id) === String(this.selectedTask.assignedTo)
+  );
 
-    const operation = this.isEditing
-      ? this.legalService.update(payload)
-      : this.legalService.add(payload);
+  const payload = {
+    ...this.selectedTask,
+    assignedTo: assignedEmployee
+      ? String(assignedEmployee.id)
+      : this.selectedTask.assignedTo,
+  };
 
-    operation.subscribe({
-      next: () => {
-        this.showToast(
-          this.isEditing
-            ? '✅ Task updated successfully'
-            : '🎯 Task added successfully'
-        );
-        modal?.hide();
-        this.loadTasks();
-      },
-      error: () => this.showToast('❌ Failed to save task. Try again.'),
-    });
-  }
+  const operation = this.isEditing
+    ? this.legalService.update(payload)
+    : this.legalService.add(payload);
+
+  operation.subscribe({
+    next: () => {
+      this.showToast(
+        this.isEditing
+          ? "✅ Task updated successfully"
+          : "🎯 Task added successfully"
+      );
+      modal?.hide();
+      this.loadTasks();
+      this.isSaving = false;
+    },
+    error: () => {
+      this.showToast("❌ Failed to save task. Try again.");
+      this.isSaving = false;
+    }
+  });
+}
+
 
   deleteTask(id?: number): void {
     if (id && confirm('Are you sure you want to delete this task?')) {

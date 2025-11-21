@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ExpenseService, Expense } from '../services/expense.service';
 import { Subscription } from 'rxjs';
-
+import { UiToastService } from '@app/services/ui-toast.service';
+ 
 declare var bootstrap: any;
 
 @Component({
@@ -14,16 +15,19 @@ export class ExpenseTrackerComponent implements OnInit, OnDestroy {
   model: Expense = { type: '', description: '', amount: 0, date: '' };
   private sub?: Subscription;
 
-  constructor(private svc: ExpenseService) {}
+  constructor(
+    private svc: ExpenseService,
+    private toast: UiToastService   // ✅ GLOBAL TOAST SERVICE
+  ) {}
 
   ngOnInit(): void {
-    // ✅ Subscribe to real-time updates
-    this.sub = this.svc.listen().subscribe(data => {
+    // SSE subscription
+    this.sub = this.svc.listen().subscribe((data) => {
       this.expenses = data.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
     });
 
-    // Fallback for initial load if SSE not yet connected
-    this.svc.getAll().subscribe(data => {
+    // Initial fallback load
+    this.svc.getAll().subscribe((data) => {
       if (!this.expenses.length && data?.length) this.expenses = data;
     });
   }
@@ -31,44 +35,42 @@ export class ExpenseTrackerComponent implements OnInit, OnDestroy {
   /** ➕ Add Expense */
   add(): void {
     if (!this.model.type || !this.model.amount) {
-      this.showToast('⚠️ Please fill all required fields');
+      this.toast.warning('⚠️ Please fill all required fields');
       return;
     }
 
     this.svc.add({ ...this.model }).subscribe({
       next: () => {
-        bootstrap.Modal.getInstance(document.getElementById('expenseModal'))?.hide();
+        this.toast.success('✅ Expense added successfully');
+
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById('expenseModal')
+        );
+        modal?.hide();
+
         this.model = { type: '', description: '', amount: 0, date: '' };
-        this.showToast('✅ Expense added successfully');
       },
-      error: () => this.showToast('❌ Failed to add expense')
+      error: () => this.toast.error('❌ Failed to add expense')
     });
   }
 
   /** 🗑️ Delete expense */
   delete(id?: number): void {
     if (!id) return;
+
     if (confirm('Are you sure you want to delete this expense?')) {
       this.svc.delete(id).subscribe({
-        next: () => this.showToast('🗑️ Expense deleted'),
-        error: () => this.showToast('❌ Failed to delete expense')
+        next: () => this.toast.success('🗑️ Expense deleted'),
+        error: () => this.toast.error('❌ Failed to delete expense')
       });
     }
   }
 
   /** 🎯 Open Add Modal */
   openAddModal(): void {
-    bootstrap.Modal.getOrCreateInstance(document.getElementById('expenseModal')).show();
-  }
-
-  /** 🔔 Toast message */
-  showToast(message: string): void {
-    const toastEl = document.getElementById('toastMessage');
-    if (toastEl) {
-      toastEl.querySelector('.toast-body')!.textContent = message;
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    }
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById('expenseModal')
+    ).show();
   }
 
   ngOnDestroy(): void {

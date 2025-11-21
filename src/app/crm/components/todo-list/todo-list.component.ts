@@ -20,6 +20,7 @@ import { EmployeeService } from '@app/services/employee.service';
 import { Employee } from '@app/models/employee.model';
 
 import { Subscription } from 'rxjs';
+import { UiToastService } from '@app/services/ui-toast.service';
 
 @Component({
   selector: 'app-todo-list',
@@ -33,6 +34,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   tasks: TodoTask[] = [];
   employees: Employee[] = [];
   selectedEmployeeEmail: string | null = null;
+  isDragSaving = false;
 
   /** Kanban Columns */
   columns = [
@@ -51,6 +53,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   dragModalOldStatus = '';
   dragModalNewStatus = '';
   dragModalNote = '';
+  isSaving = false;
 
   // Full list of task titles (keep your full list)
   taskTitleOptions: string[] = [
@@ -143,34 +146,59 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private liveSub?: Subscription;
 
-  constructor(private svc: TodoService, private empService: EmployeeService) {}
+  constructor(
+    private svc: TodoService,
+    private empService: EmployeeService,
+    private toast: UiToastService
+  ) {}
 
   // ---------------------------------------------------
   // INIT
   // ---------------------------------------------------
   ngOnInit(): void {
-    // employee list used for dropdown & assignedEmail lookup
+    console.log('🔥 INIT → Loading employees first...');
+
     this.empService.getAllEmployees().subscribe({
-      next: (res) => (this.employees = res || []),
+      next: (res) => {
+        this.employees = res || [];
+        console.log('✔ Employees loaded:', this.employees);
+
+        // Now load tasks AFTER employees load
+        this.loadTasks();
+        this.initLiveStream();
+      },
       error: (err) => {
-        console.error('Failed to load employees:', err);
+        console.error('❌ Employee API failed:', err);
         this.employees = [];
+
+        // Still load tasks to avoid blank screen
+        this.loadTasks();
+        this.initLiveStream();
       },
     });
+  }
 
-    // SSE / real-time subscription
-    this.liveSub = this.svc.listen().subscribe((list) => {
-      this.tasks = this.mapEmployeeNames(list || []);
-      this.refreshColumns();
-    });
-
-    // initial fetch fallback
+  loadTasks() {
+    console.log('📥 Loading tasks...');
     this.svc.getAll().subscribe({
       next: (list) => {
+        console.log('✔ Tasks loaded:', list);
         this.tasks = this.mapEmployeeNames(list || []);
         this.refreshColumns();
       },
-      error: (err) => console.error('Failed to load tasks:', err),
+      error: (err) => console.error('❌ Failed to load tasks:', err),
+    });
+  }
+
+  initLiveStream() {
+    console.log('🌐 Starting SSE...');
+    this.liveSub = this.svc.listen().subscribe({
+      next: (list) => {
+        console.log('📡 SSE update:', list);
+        this.tasks = this.mapEmployeeNames(list || []);
+        this.refreshColumns();
+      },
+      error: (err) => console.error('❌ SSE stream failed:', err),
     });
   }
 
@@ -186,19 +214,28 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   // Map employee id → name for display and include assignedEmail if possible
   // ---------------------------------------------------
   mapEmployeeNames(list: TodoTask[]): TodoTask[] {
+    if (!this.employees || this.employees.length === 0) {
+      console.warn('⚠️ Employees not loaded yet!');
+      return list; // return tasks as-is
+    }
+
     return list.map((t) => {
-      const emp = this.employees.find((e) => String(e.id) === String(t.assignedTo));
+      const emp = this.employees.find(
+        (e) => String(e.id) === String(t.assignedTo)
+      );
       return {
         ...t,
-        assignedToName: emp?.name || (t.assignedTo ? String(t.assignedTo) : '-'),
-        assignedEmail: emp?.email || (t as any).assignedEmail || null,
-      } as TodoTask;
+        assignedToName: emp?.name || '-',
+        assignedEmail: emp?.email || null,
+      };
     });
   }
 
   // helper used by template to display assigned email quickly
   updateAssignedEmailView(): void {
-    const emp = this.employees.find(e => String(e.id) === String(this.editing?.assignedTo));
+    const emp = this.employees.find(
+      (e) => String(e.id) === String(this.editing?.assignedTo)
+    );
     this.selectedEmployeeEmail = emp?.email || null;
   }
 
@@ -209,7 +246,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.editing) return 'No employee selected';
     const assignedId = this.editing.assignedTo;
     if (!assignedId) return 'No employee selected';
-    const emp = this.employees.find(e => String(e.id) === String(assignedId));
+    const emp = this.employees.find((e) => String(e.id) === String(assignedId));
     return emp?.email || 'No employee selected';
   }
 
@@ -239,7 +276,12 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // transfer item visually first
-    transferArrayItem(prevList, currList, event.previousIndex, event.currentIndex);
+    transferArrayItem(
+      prevList,
+      currList,
+      event.previousIndex,
+      event.currentIndex
+    );
 
     const moved = currList[event.currentIndex];
     if (!moved) return;
@@ -267,59 +309,42 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Save action from drag modal -> validation + send to backend
   saveDragModal(): void {
+    if (this.isDragSaving) return;
+    this.isDragSaving = true;
+
     if (!this.dragModalTask) return;
 
     const note = (this.dragModalNote || '').trim();
     if (!note) {
-      alert('Please enter a note describing the status change. Note is required.');
+      this.toast.showError('Note is required before changing status ⚠️');
+      this.isDragSaving = false;
       return;
     }
 
-    // Update task copy with new status & note
     this.dragModalTask.status = this.dragModalNewStatus as any;
-    // append note to existing notes
     this.dragModalTask.notes = this.dragModalTask.notes
-      ? `${this.dragModalTask.notes}\n[Status change note] ${note}`
-      : `[Status change note] ${note}`;
+      ? `${this.dragModalTask.notes}\n[Status Change] ${note}`
+      : `[Status Change] ${note}`;
 
-    // keep lastStatus (helps backend detect change)
     (this.dragModalTask as any).lastStatus = this.dragModalOldStatus;
-
-    // ensure assignedEmail exists
-    this.applyAssignedEmail(this.dragModalTask as Partial<TodoTask> & { assignedTo?: any });
+    this.applyAssignedEmail(this.dragModalTask);
 
     const payload = this.stripUiFields(this.dragModalTask);
 
-    // call backend
     this.svc.update(payload).subscribe({
       next: () => {
-        // hide modal, refresh full list from server (safer) and columns
+        this.toast.showSuccess('Status updated ✔');
         this.dragModalVisible = false;
         this.dragModalTask = null;
         this.dragModalNote = '';
-        this.svc.getAll().subscribe({
-          next: (list) => {
-            this.tasks = this.mapEmployeeNames(list || []);
-            this.refreshColumns();
-          },
-          error: (err) => {
-            console.error('Failed to reload tasks after update:', err);
-          },
-        });
+        this.isDragSaving = false;
+
+        this.loadTasks();
       },
       error: (err) => {
-        console.error('Failed to update status on backend:', err);
-        alert('Failed to update status. Reverting UI.');
-        // revert by reloading canonical data
-        this.dragModalVisible = false;
-        this.dragModalTask = null;
-        this.svc.getAll().subscribe({
-          next: (list) => {
-            this.tasks = this.mapEmployeeNames(list || []);
-            this.refreshColumns();
-          },
-          error: (err2) => console.error('Failed to reload after update error:', err2),
-        });
+        console.error(err);
+        this.toast.showError('Status update failed ❌');
+        this.isDragSaving = false;
       },
     });
   }
@@ -344,7 +369,8 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   // ---------------------------------------------------
   isOverdue(t: TodoTask): boolean {
     return t.dueDate
-      ? t.status !== 'Completed' && t.dueDate < new Date().toISOString().slice(0, 10)
+      ? t.status !== 'Completed' &&
+          t.dueDate < new Date().toISOString().slice(0, 10)
       : false;
   }
 
@@ -374,14 +400,33 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   // Save (create or update) — send cleaned payload
   // ---------------------------------------------------
   save(task: TodoTask): void {
-    this.applyAssignedEmail(task);
+    if (this.isSaving) return; // avoid duplicate clicks
+    this.isSaving = true;
 
+    // Track old status if changed
+    if (task.id) {
+      const original = this.tasks.find((t) => t.id === task.id);
+      if (original && original.status !== task.status) {
+        (task as any).lastStatus = original.status;
+      }
+    }
+
+    this.applyAssignedEmail(task);
     const cleaned = this.stripUiFields(task);
+
     const req = cleaned.id ? this.svc.update(cleaned) : this.svc.add(cleaned);
 
     req.subscribe({
-      next: () => (this.editing = null),
-      error: (err) => console.error(err),
+      next: () => {
+        this.toast.showSuccess('Task saved successfully ✔');
+        this.editing = null;
+        this.isSaving = false;
+      },
+      error: (err) => {
+        this.toast.showError('Failed to save task ❌');
+        this.isSaving = false;
+        console.error(err);
+      },
     });
   }
 

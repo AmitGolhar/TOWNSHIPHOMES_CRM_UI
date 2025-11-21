@@ -23,7 +23,9 @@ import { MagicBricksLeadsComponent } from './components/magicbricks-leads/magicb
 import { NinetyNineAcresLeadComponent } from './components/ninety-nine-acres-lead/ninety-nine-acres-lead.component';
 import { EmployeeListComponent } from './components/employee-list/employee-list.component';
 import { EmployeeFilterPipe } from '@app/pipes/employee-filter.pipe';
- 
+import { HousingWhatsAppComponent } from './components/housing-whatsapp/housing-whatsapp.component';
+import { Acres99WhatsAppComponent } from './components/acres99-whatsapp/acres99-whatsapp.component';
+   
 
 @NgModule({
   declarations: [
@@ -42,7 +44,9 @@ import { EmployeeFilterPipe } from '@app/pipes/employee-filter.pipe';
     MagicBricksLeadsComponent,
     NinetyNineAcresLeadComponent,
     EmployeeListComponent,
-     EmployeeFilterPipe
+     EmployeeFilterPipe,
+     HousingWhatsAppComponent,
+     Acres99WhatsAppComponent
     
   ],
   imports: [

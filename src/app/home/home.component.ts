@@ -1,62 +1,67 @@
 import { Component, OnInit } from '@angular/core';
 import { PropertyService } from '../core/services/property.service';
- import { HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostPropertiesService } from '../services/post-properties.service';
-  
+import { UiToastService } from '@app/services/ui-toast.service';
+ 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  //properties: Property[] = [];
+
   cities: string[] = ['Pune', 'Mumbai', 'Bangalore', 'Delhi', 'Chennai'];
-  //selectedCity: string = '';
   query: string = '';
   selectedTab: string = 'Rent';
-  propertiesList:any = [];
-  currentSelectedProperty:any;
+  propertiesList: any = [];
+  currentSelectedProperty: any;
 
-  properties: any[] = [];
   page = 0;
   size = 10;
   isLoading = false;
   hasMore = true;
-  pageLoading =false;
- 
-  apartmentType :string =''
-  bhkType:string =''
-  localityCity:string = ''
-  withinDays: string =''
-  propertyType:string =   '';
 
- 
-    propertyAdsType:string =   '';
-   
-      commercialPropertyType:string =   '';
-       buildingType:string =   '';
-        city:string =   '';
-         locality:string =   '';
-minPrice:string =   '';
-         maxPrice:string =   '';
+  apartmentType = '';
+  bhkType = '';
+  localityCity = '';
+  withinDays = '';
+  propertyType = '';
+
+  propertyAdsType = '';
+  commercialPropertyType = '';
+  buildingType = '';
+  city = '';
+  locality = '';
+  minPrice = '';
+  maxPrice = '';
 
   constructor(
     private propertyService: PropertyService,
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute,
-    private postPropertiesService:PostPropertiesService
+    private postPropertiesService: PostPropertiesService,
+    private toast: UiToastService      // ✅ Inject toast service
   ) {}
 
   ngOnInit(): void {
-   
     this.loadProperties();
   }
 
+  // ----------------------------------------------------------------
+  // 🔍 SEARCH
+  // ----------------------------------------------------------------
   searchProperty(query: string) {
+    if (!this.localityCity) {
+      this.toast.warning("⚠️ Please select a city before searching.");
+      return;
+    }
+
+    this.toast.info("🔎 Searching properties...");
+
     if (this.selectedTab === 'Buy') {
-      //  this.router.navigate(['/buy']);
       this.router.navigate(
         [
           '/buy',
@@ -99,64 +104,72 @@ minPrice:string =   '';
     }
   }
 
-  onPurposeChange(value: string) {
-  this.propertyAdsType = value;
-  console.log('Purpose selected:', value);
- 
-}
-
+  // ----------------------------------------------------------------
+  // 🟦 TAB CHANGE
+  // ----------------------------------------------------------------
   onTabClick(tab: string) {
     this.selectedTab = tab;
-      console.log(this.selectedTab)
-    // You can now call any logic here based on selected tab
   }
 
-  getListOfProperties1(){
-    this.postPropertiesService.getpostAds().subscribe(data => {
-     // this.propertiesList = data
-      
-    })
-  }
-  getSelectedProperty(selectedProperty:any){
+  // ----------------------------------------------------------------
+  // 🟩 SELECT PROPERTY
+  // ----------------------------------------------------------------
+  getSelectedProperty(selectedProperty: any) {
     this.currentSelectedProperty = selectedProperty;
-     console.log(this.currentSelectedProperty);
+  }
+onPurposeChange(value: string) {
+  this.propertyAdsType = value;
+  console.log("Purpose selected:", value);
+}
+
+  // ----------------------------------------------------------------
+  // ♻ INFINITE SCROLL LOAD PROPERTIES
+  // ----------------------------------------------------------------
+  loadProperties() {
+    if (this.isLoading || !this.hasMore) return;
+
+    this.isLoading = true;
+
+    this.postPropertiesService.getRendedlistOfProperties(this.page, this.size).subscribe({
+      next: (response: any) => {
+        if (response?.content?.length) {
+          this.propertiesList.push(...response.content);
+          this.page++;
+          this.hasMore = !response.last;
+        } else {
+          this.hasMore = false;
+          this.toast.info("ℹ️ No more properties available.");
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.error("❌ Failed to load properties. Please try again.");
+        this.isLoading = false;
+      },
+    });
   }
 
-loadProperties() {
-  if (this.isLoading || !this.hasMore) return;
+  // ----------------------------------------------------------------
+  // ➕ SCROLL EVENT
+  // ----------------------------------------------------------------
+  onScroll() {
+    this.loadProperties();
+  }
 
-  this.isLoading = true;
+  // ----------------------------------------------------------------
+  // 🕒 FORMAT TIME
+  // ----------------------------------------------------------------
+  formatTimeToDate(time: string): Date {
+    if (!time) return new Date();
 
-  this.postPropertiesService.getRendedlistOfProperties(this.page, this.size).subscribe(
-    (response: { content: any[]; last: boolean; }) => {
-      if (response?.content?.length) {
-        this.propertiesList.push(...response.content);
-        this.page++;
-        this.hasMore = !response.last;
-        console.log(this.propertiesList)
-      } else {
-        this.hasMore = false;
-      }
+    const parts = time.split(':');
+    if (parts.length < 2) return new Date();
 
-      this.isLoading = false;
-    },
-    error => {
-      console.error('Error loading properties', error);
-      this.isLoading = false;
-    }
-  );
-}
+    const [hours, minutes, seconds] = parts.map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, seconds || 0);
 
-
-onScroll() {
-  this.loadProperties();
-}
-formatTimeToDate(time: string): Date {
-  const [hours, minutes, seconds] = time.split(':').map(Number);
-  const date = new Date();
-  date.setHours(hours, minutes, seconds || 0);
-  return date;
-}
-
-
+    return date;
+  }
 }

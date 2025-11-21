@@ -1,49 +1,78 @@
 <div class="crm-wrapper">
-  <!-- Mobile Menu Toggle -->
-  <button class="crm-toggle-btn d-md-none" (click)="toggleMenu()">
-    ☰
-  </button>
+    <!-- Mobile Menu Toggle -->
+    <button class="crm-toggle-btn d-md-none" (click)="toggleMenu()">
+        ☰
+    </button>
 
-  <!-- Sidebar -->
-  <nav class="crm-sidebar" [class.open]="menuOpen">
-    <div class="sidebar-header d-flex justify-content-between align-items-center">
-      <h6 class="fw-bold text-primary mb-0">🏠 CRM Menu</h6>
-      <button class="btn-close d-md-none" (click)="toggleMenu()" aria-label="Close"></button>
-    </div>
+    <!-- Sidebar -->
+    <nav class="crm-sidebar" [class.open]="menuOpen">
+        <div class="sidebar-header d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold text-primary mb-0">🏠 CRM Menu</h6>
+            <button class="btn-close d-md-none" (click)="toggleMenu()" aria-label="Close"></button>
+        </div>
 
-    <div class="nav-scroll">
-      <ul class="nav flex-column gap-1">
-        <li class="nav-item"><a routerLink="dashboard" routerLinkActive="active" class="nav-link" (click)="closeMenu()">📊 Dashboard</a></li>
-          <li class="nav-item"><a routerLink="add" routerLinkActive="active" class="nav-link" (click)="closeMenu()">📊 Add Employee</a></li>
-         <li class="nav-item"><a routerLink="list" routerLinkActive="active" class="nav-link" (click)="closeMenu()">📊 List Of Employee</a></li>
-        <li class="nav-item"><a routerLink="lead-management" routerLinkActive="active" class="nav-link" (click)="closeMenu()">👥 Lead Management</a></li>
-        <li class="nav-item"><a routerLink="magicbricks-leads" routerLinkActive="active" class="nav-link" (click)="closeMenu()">📈 Housing Leads</a></li>
-        <li class="nav-item"><a routerLink="99acres-leads" routerLinkActive="active" class="nav-link" (click)="closeMenu()">🏘 99 Acres Leads</a></li>
-        <li class="nav-item"><a routerLink="property-listing" routerLinkActive="active" class="nav-link" (click)="closeMenu()">🏘 Property Listing</a></li>
-        <li class="nav-item"><a routerLink="client-interaction" routerLinkActive="active" class="nav-link" (click)="closeMenu()">💬 Client Interaction</a></li>
-        <li class="nav-item"><a routerLink="marketing-outreach" routerLinkActive="active" class="nav-link" (click)="closeMenu()">📣 Marketing & Outreach</a></li>
-        <li class="nav-item"><a routerLink="legal-documentation" routerLinkActive="active" class="nav-link" (click)="closeMenu()">📑 Legal & Documentation</a></li>
-        <li class="nav-item"><a routerLink="client-support" routerLinkActive="active" class="nav-link" (click)="closeMenu()">🧰 Client Support & After Sales</a></li>
-        <li class="nav-item"><a routerLink="admin-internal" routerLinkActive="active" class="nav-link" (click)="closeMenu()">🏢 Admin & Internal</a></li>
-        <li class="nav-item"><a routerLink="custom-smart" routerLinkActive="active" class="nav-link" (click)="closeMenu()">🤖 Custom / Smart Tasks</a></li>
-        <li class="nav-item"><a routerLink="payments" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" (click)="closeMenu()">💰 Payments</a></li>
-        <li class="nav-item"><a routerLink="payments/add" routerLinkActive="active" class="nav-link" (click)="closeMenu()">➕ Payments Add</a></li>
-        <li class="nav-item"><a routerLink="finance/revenue" routerLinkActive="active" class="nav-link" (click)="closeMenu()">📈 Revenue</a></li>
-        <li class="nav-item"><a routerLink="finance/attendance" routerLinkActive="active" class="nav-link" (click)="closeMenu()">🕒 Attendance</a></li>
-        <li class="nav-item"><a routerLink="finance/incentives" routerLinkActive="active" class="nav-link" (click)="closeMenu()">🎯 Incentives</a></li>
-        <li class="nav-item"><a routerLink="finance/expenses" routerLinkActive="active" class="nav-link" (click)="closeMenu()">💳 Expenses</a></li>
-        <li class="nav-item"><a routerLink="tasks" routerLinkActive="active" class="nav-link" (click)="closeMenu()">📋 Task</a></li>
-        <li class="nav-item"><a routerLink="finance/aging" routerLinkActive="active" class="nav-link" (click)="closeMenu()">⏳ Aging</a></li>
-        <li class="nav-item"><a routerLink="finance/followups" routerLinkActive="active" class="nav-link" (click)="closeMenu()">🔔 Followups</a></li>
-      </ul>
-    </div>
-  </nav>
+        <div class="nav-scroll">
+            <ul class="nav flex-column gap-1">
+                <li class="nav-item"><a routerLink="dashboard" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">📊 Dashboard</a></li>
+                <li class="nav-item"><a routerLink="housing-whatsapp" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">🏘 Housing Add New Leads</a></li>
+                <li class="nav-item"><a routerLink="acres99-whatsapp" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">📊 99acres Add New Leads</a></li>
+                <li class="nav-item"><a routerLink="add" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">👥 Add
+                        Employee</a></li>
+                <li class="nav-item"><a routerLink="list" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">👥
+                        List Of Employee</a></li>
+                <li class="nav-item"><a routerLink="lead-management" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">👥 Lead Management</a></li>
+                <li class="nav-item"><a routerLink="magicbricks-leads" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">📈 Housing Leads Excel Upload</a></li>
+                <li class="nav-item"><a routerLink="99acres-leads" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">📋 99 Acres Leads Excel Upload</a></li>
+                <li class="nav-item"><a routerLink="property-listing" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">🏘 Property Listing</a></li>
+                <li class="nav-item"><a routerLink="client-interaction" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">💬 Client Interaction</a></li>
+                <li class="nav-item"><a routerLink="marketing-outreach" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">📣 Marketing & Outreach</a></li>
+                <li class="nav-item"><a routerLink="legal-documentation" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">📑 Legal & Documentation</a></li>
+                <li class="nav-item"><a routerLink="client-support" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">🧰 Client Support & After Sales</a></li>
+                <li class="nav-item"><a routerLink="admin-internal" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">🏢 Admin & Internal</a></li>
+                <li class="nav-item"><a routerLink="custom-smart" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">🤖 Custom / Smart Tasks</a></li>
+                <li class="nav-item"><a routerLink="payments" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">💰 Payments</a></li>
+                <li class="nav-item"><a routerLink="payments/add" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">➕ Payments Add</a></li>
+                <li class="nav-item"><a routerLink="finance/revenue" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">📈 Revenue</a></li>
+                <li class="nav-item"><a routerLink="finance/attendance" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">🕒 Attendance</a></li>
+                <li class="nav-item"><a routerLink="finance/incentives" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">🎯 Incentives</a></li>
+                <li class="nav-item"><a routerLink="finance/expenses" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">💳 Expenses</a></li>
+                <li class="nav-item"><a routerLink="tasks" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">📋
+                        Task</a></li>
+                <li class="nav-item"><a routerLink="finance/aging" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">⏳ Aging</a></li>
+                <li class="nav-item"><a routerLink="finance/followups" routerLinkActive="active" class="nav-link"
+                        (click)="closeMenu()">🔔 Followups</a></li>
+            </ul>
+        </div>
+    </nav>
 
-  <!-- Mobile Overlay -->
-  <div *ngIf="menuOpen" class="crm-overlay d-md-none" (click)="closeMenu()"></div>
+    <!-- Mobile Overlay -->
+    <div *ngIf="menuOpen" class="crm-overlay d-md-none" (click)="closeMenu()"></div>
 
-  <!-- Main Content -->
-  <main class="crm-content p-3">
-    <router-outlet></router-outlet>
-  </main>
+    <!-- Main Content -->
+    <main class="crm-content p-3">
+        <router-outlet></router-outlet>
+    </main>
 </div>

@@ -20,6 +20,7 @@ export class AdminInternalComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   employees: Employee[] = [];
+employeeMap: any = {};   // 🔥 NEW
 
   taskTypes: string[] = [
     'Team Meeting / Briefing',
@@ -45,6 +46,7 @@ export class AdminInternalComponent implements OnInit {
   priorities: string[] = ['Low', 'Medium', 'High'];
   statuses: string[] = ['Pending', 'In Progress', 'Completed'];
 loading = true;
+isSaving = false;
 
   constructor(
     private adminService: AdminService,
@@ -75,12 +77,21 @@ loading = true;
       });
   }
 
-  loadEmployees() {
-    this.employeeService.getAllEmployees().subscribe({
-      next: (res) => (this.employees = res || []),
-      error: (err) => console.error('Error loading employees:', err),
-    });
-  }
+loadEmployees() {
+  this.employeeService.getAllEmployees().subscribe({
+    next: (res) => {
+      this.employees = res || [];
+
+      // 🔥 Build employeeMap (same as Marketing)
+      this.employeeMap = {};
+      this.employees.forEach(emp => {
+        this.employeeMap[String(emp.id)] = emp.name;
+      });
+    },
+    error: (err) => console.error('Error loading employees:', err),
+  });
+}
+
 
   /** 🔹 Open Add Modal */
   openAddModal(): void {
@@ -96,28 +107,32 @@ loading = true;
     new bootstrap.Modal(document.getElementById('adminModal')).show();
   }
 
-  saveTask(): void {
-    const modalEl = document.getElementById('adminModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
+saveTask(): void {
+  if (this.isSaving) return; // prevent double click
+  this.isSaving = true;
 
-    // 🔥 Ensure assignedTo = employeeId (not email)
-    const assignedEmployee = this.employees.find(
-      (e) => String(e.id) === String(this.selectedTask.assignedTo)
-    );
+  const modalEl = document.getElementById('adminModal');
+  const modal = bootstrap.Modal.getInstance(modalEl);
 
-    // Build payload with correct assignedTo value
-    const payload = {
-      ...this.selectedTask,
-      assignedTo: assignedEmployee
-        ? String(assignedEmployee.id)
-        : this.selectedTask.assignedTo,
-    };
+  // 🔥 Ensure assignedTo = employeeId (not email)
+  const assignedEmployee = this.employees.find(
+    (e) => String(e.id) === String(this.selectedTask.assignedTo)
+  );
 
-    const operation = this.isEditing
-      ? this.adminService.update(payload)
-      : this.adminService.add(payload);
+  const payload = {
+    ...this.selectedTask,
+    assignedTo: assignedEmployee
+      ? String(assignedEmployee.id)
+      : this.selectedTask.assignedTo,
+  };
 
-    operation.subscribe({
+  const operation = this.isEditing
+    ? this.adminService.update(payload)
+    : this.adminService.add(payload);
+
+  operation
+    .pipe(finalize(() => (this.isSaving = false))) // 👈 AUTO RESET
+    .subscribe({
       next: () => {
         this.showToast(
           this.isEditing
@@ -129,7 +144,8 @@ loading = true;
       },
       error: () => this.showToast('❌ Failed to save task. Please retry.'),
     });
-  }
+}
+
 
   /** 🔹 Delete */
   deleteTask(id?: number): void {

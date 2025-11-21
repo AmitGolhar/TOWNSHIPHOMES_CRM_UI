@@ -20,6 +20,7 @@ export class ClientSupportComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   employees: Employee[] = [];
+employeeMap: any = {};  // 🔥 NEW
 
   taskTypes: string[] = [
     'Handover Scheduling',
@@ -34,6 +35,7 @@ export class ClientSupportComponent implements OnInit {
 
   statuses: string[] = ['Pending', 'In Progress', 'Resolved', 'Closed'];
   loading = true;
+isSaving = false;
 
   constructor(
     private supportService: SupportService,
@@ -63,12 +65,21 @@ export class ClientSupportComponent implements OnInit {
       });
   }
 
-  loadEmployees() {
-    this.employeeService.getAllEmployees().subscribe({
-      next: (res) => (this.employees = res),
-      error: (err) => console.error('Error loading employees:', err),
-    });
-  }
+loadEmployees() {
+  this.employeeService.getAllEmployees().subscribe({
+    next: (res) => {
+      this.employees = res || [];
+
+      // 🔥 Create ID → Name map (same as marketing)
+      this.employeeMap = {};
+      this.employees.forEach(emp => {
+        this.employeeMap[String(emp.id)] = emp.name;
+      });
+    },
+    error: (err) => console.error('Error loading employees:', err),
+  });
+}
+
   // 🔹 Open Add Modal
   openAddModal(): void {
     this.isEditing = false;
@@ -82,38 +93,45 @@ export class ClientSupportComponent implements OnInit {
     this.selectedTask = { ...task };
     new bootstrap.Modal(document.getElementById('supportModal')).show();
   }
-
 saveTask(): void {
+  if (this.isSaving) return; // prevent double submission
+  this.isSaving = true;
+
   const modalEl = document.getElementById('supportModal');
   const modal = bootstrap.Modal.getInstance(modalEl);
 
-  // 🔥 Ensure assignedTo = employeeId (not email)
+  // Ensure employee ID is saved
   const assignedEmployee = this.employees.find(
-    e => String(e.id) === String(this.selectedTask.assignedTo)
+    (e) => String(e.id) === String(this.selectedTask.assignedTo)
   );
 
   const payload = {
     ...this.selectedTask,
-    assignedTo: assignedEmployee ? String(assignedEmployee.id) : this.selectedTask.assignedTo
+    assignedTo: assignedEmployee
+      ? String(assignedEmployee.id)
+      : this.selectedTask.assignedTo,
   };
 
   const operation = this.isEditing
     ? this.supportService.update(payload)
     : this.supportService.add(payload);
 
-  operation.subscribe({
-    next: () => {
-      this.showToast(
-        this.isEditing
-          ? '✅ Task updated successfully'
-          : '🎯 Task added successfully'
-      );
-      modal?.hide();
-      this.loadTasks();
-    },
-    error: () => this.showToast('❌ Failed to save task. Try again.')
-  });
+  operation
+    .pipe(finalize(() => (this.isSaving = false))) // ⭐ RESET BUTTON
+    .subscribe({
+      next: () => {
+        this.showToast(
+          this.isEditing
+            ? '✅ Task updated successfully'
+            : '🎯 Task added successfully'
+        );
+        modal?.hide();
+        this.loadTasks();
+      },
+      error: () => this.showToast('❌ Failed to save task. Try again.'),
+    });
 }
+
 
 
   // 🔹 Delete Task

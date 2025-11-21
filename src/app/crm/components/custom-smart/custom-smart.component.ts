@@ -20,6 +20,7 @@ export class CustomSmartComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   employees: Employee[] = [];
+employeeMap: any = {}; // 🔥 NEW
 
   taskTypes: string[] = [
     'SLA Breach Alert',
@@ -50,6 +51,7 @@ export class CustomSmartComponent implements OnInit {
   ];
 
   statuses: string[] = ['Pending', 'Triggered', 'Executed', 'Resolved'];
+isSaving = false;
 
 constructor(
   private smartService: SmartService,
@@ -91,45 +93,62 @@ constructor(
 
 /** 🔹 Save or Update Automation Task */
 saveTask(): void {
+  if (this.isSaving) return; // prevent double click
+  this.isSaving = true;
+
   const modalEl = document.getElementById('smartModal');
   const modal = bootstrap.Modal.getInstance(modalEl);
 
-  // 🔥 Ensure assignedTo = employeeId (not email)
+  // Ensure assignedTo = employee ID
   const assignedEmployee = this.employees.find(
     e => String(e.id) === String(this.selectedTask.assignedTo)
   );
 
-  // Build payload with corrected assignedTo
   const payload: SmartTask = {
     ...this.selectedTask,
-    assignedTo: assignedEmployee ? String(assignedEmployee.id) : this.selectedTask.assignedTo
+    assignedTo: assignedEmployee
+      ? String(assignedEmployee.id)
+      : this.selectedTask.assignedTo
   };
 
   const operation = this.isEditing
     ? this.smartService.update(payload)
     : this.smartService.add(payload);
 
-  operation.subscribe({
-    next: () => {
-      this.showToast(
-        this.isEditing
-          ? '✅ Task updated successfully!'
-          : '🎯 New smart automation added!'
-      );
-      modal?.hide();
-      this.loadTasks();
-    },
-    error: () => this.showToast('❌ Failed to save task. Please retry.')
-  });
+  operation
+    .pipe(finalize(() => (this.isSaving = false))) // RESET BUTTON
+    .subscribe({
+      next: () => {
+        this.showToast(
+          this.isEditing
+            ? '✅ Task updated successfully!'
+            : '🎯 New smart automation added!'
+        );
+        modal?.hide();
+        this.loadTasks();
+      },
+      error: () =>
+        this.showToast('❌ Failed to save task. Please retry.')
+    });
 }
 
 
-  loadEmployees() {
+
+loadEmployees() {
   this.employeeService.getAllEmployees().subscribe({
-    next: (res) => (this.employees = res),
+    next: (res) => {
+      this.employees = res || [];
+
+      // 🔥 Build ID → Name map (same pattern as all other modules)
+      this.employeeMap = {};
+      this.employees.forEach(emp => {
+        this.employeeMap[String(emp.id)] = emp.name;
+      });
+    },
     error: (err) => console.error('Error loading employees:', err)
   });
 }
+
 
   /** 🔹 Delete Automation Task */
   deleteTask(id?: number): void {

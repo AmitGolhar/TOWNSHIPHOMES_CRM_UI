@@ -3,9 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PaymentService } from '../payment.service';
 import { Payment } from '../modal/payment.model';
 import { finalize } from 'rxjs/operators';
-
-declare var bootstrap: any;
-
+import { UiToastService } from '@app/services/ui-toast.service';
+ 
 @Component({
   selector: 'app-payment-form',
   templateUrl: './payment-form.component.html',
@@ -29,7 +28,8 @@ export class PaymentFormComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private svc: PaymentService
+    private svc: PaymentService,
+    private toast: UiToastService    // ✅ GLOBAL TOAST
   ) {}
 
   ngOnInit(): void {
@@ -42,22 +42,20 @@ export class PaymentFormComponent implements OnInit {
 
   loadPayment(id: number): void {
     this.loading = true;
-    this.svc
-      .getAll()
+    this.svc.getAll()
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (payments) => {
-          const found = payments.find((p) => p.id === id);
+          const found = payments.find(p => p.id === id);
           if (found) {
             this.payment = { ...found };
           } else {
-            this.showToast('❌ Payment not found');
+            this.toast.error('❌ Payment not found');
             this.router.navigate(['/crm/payments']);
           }
         },
-        error: (err) => {
-          console.error('Error loading payment:', err);
-          this.showToast('⚠️ Failed to load payment details');
+        error: () => {
+          this.toast.error('⚠️ Failed to load payment details');
           this.router.navigate(['/crm/payments']);
         }
       });
@@ -67,52 +65,44 @@ export class PaymentFormComponent implements OnInit {
     this.payment.pendingAmount =
       (this.payment.totalAmount || 0) - (this.payment.paidAmount || 0);
 
-    if (this.payment.paidAmount === 0)
+    if (this.payment.paidAmount === 0) {
       this.payment.status = 'Pending';
-    else if (this.payment.paidAmount < this.payment.totalAmount)
+    } else if (this.payment.paidAmount < this.payment.totalAmount) {
       this.payment.status = 'Partial';
-    else this.payment.status = 'Paid';
+    } else {
+      this.payment.status = 'Paid';
+    }
   }
 
   save(): void {
     if (!this.payment.clientName || !this.payment.totalAmount) {
-      this.showToast('⚠️ Please fill all required fields');
+      this.toast.warning('⚠️ Please fill all required fields');
       return;
     }
 
     this.loading = true;
-    const action = this.isEditMode
+    const request$ = this.isEditMode
       ? this.svc.update(this.payment)
       : this.svc.add(this.payment);
 
-    action.pipe(finalize(() => (this.loading = false))).subscribe({
-      next: () => {
-        this.showToast(
-          this.isEditMode
-            ? '✅ Payment updated successfully'
-            : '💰 Payment added successfully'
-        );
-        setTimeout(() => this.router.navigate(['/crm/payments']), 1000);
-      },
-      error: (err) => {
-        console.error('Error saving payment:', err);
-        this.showToast('❌ Failed to save payment');
-      }
-    });
-  }
-
-  // 🔹 Toast message utility
-  showToast(message: string): void {
-    const toastEl = document.getElementById('toastMessage');
-    if (toastEl) {
-      toastEl.querySelector('.toast-body')!.textContent = message;
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    }
+    request$
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+          this.toast.success(
+            this.isEditMode
+              ? '✅ Payment updated successfully'
+              : '💰 Payment added successfully'
+          );
+          setTimeout(() => this.router.navigate(['/crm/payments']), 800);
+        },
+        error: () => {
+          this.toast.error('❌ Failed to save payment');
+        }
+      });
   }
 
   goBack() {
-  this.router.navigate(['/crm/payments']);
-}
-
+    this.router.navigate(['/crm/payments']);
+  }
 }

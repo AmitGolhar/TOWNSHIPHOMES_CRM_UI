@@ -23,6 +23,8 @@ import { MagicBricksLeadsComponent } from './components/magicbricks-leads/magicb
 import { NinetyNineAcresLeadComponent } from './components/ninety-nine-acres-lead/ninety-nine-acres-lead.component';
 import { EmployeeAddComponent } from './components/employee-add/employee-add.component';
 import { EmployeeListComponent } from './components/employee-list/employee-list.component';
+import { HousingWhatsAppComponent } from './components/housing-whatsapp/housing-whatsapp.component';
+import { Acres99WhatsAppComponent } from './components/acres99-whatsapp/acres99-whatsapp.component';
 
 const routes: Routes = [
   {
@@ -57,10 +59,13 @@ const routes: Routes = [
       { path: 'finance/incentives', component: IncentiveComponent },
       { path: 'finance/expenses', component: ExpenseTrackerComponent },
       { path: 'tasks', component: TodoListComponent },
-      { path: 'magicbricks-leads',component: MagicBricksLeadsComponent},
-      { path: '99acres-leads',component: NinetyNineAcresLeadComponent},
+      { path: 'magicbricks-leads', component: MagicBricksLeadsComponent },
+      { path: '99acres-leads', component: NinetyNineAcresLeadComponent },
       { path: 'add', component: EmployeeAddComponent },
-     { path: 'list', component: EmployeeListComponent },
+      { path: 'list', component: EmployeeListComponent },
+      { path: 'housing-whatsapp', component: HousingWhatsAppComponent },
+        { path: 'acres99-whatsapp', component: Acres99WhatsAppComponent },
+
       { path: '**', redirectTo: 'dashboard' },
     ],
   },

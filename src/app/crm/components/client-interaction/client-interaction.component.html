@@ -20,6 +20,8 @@
       <th>#</th>
       <th>Task Type</th>
       <th>Client</th>
+      <th>Contact</th> <!-- 🔥 New Click-to-Call Column -->
+
       <th>Property</th>
       <th>Assigned To</th>
       <th>Status</th>
@@ -32,8 +34,14 @@
       <td>{{ i + 1 }}</td>
       <td>{{ task.taskType }}</td>
       <td>{{ task.clientName }}</td>
+      <td>
+        <a *ngIf="task.contactNumber" [href]="'tel:' + task.contactNumber"
+          class="text-decoration-none text-primary fw-bold">
+          {{ task.contactNumber }}
+        </a>
+      </td>
       <td>{{ task.propertyName }}</td>
-      <td>{{ task.assignedTo }}</td>
+<td>{{ employeeMap[task.assignedTo] || '-' }}</td>
       <td>
         <span class="badge" [ngClass]="{
                 'bg-warning': task.status === 'Pending',
@@ -92,7 +100,7 @@
               <select class="form-select" [(ngModel)]="selectedTask.assignedTo" name="assignedTo">
                 <option value="">Select Employee...</option>
                 <option *ngFor="let emp of employees" [value]="emp.id">
-                  {{ emp.name }}  
+                  {{ emp.name }}
                 </option>
               </select>
             </div>
@@ -118,10 +126,24 @@
         </form>
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" (click)="saveTask()">{{ isEditing ? 'Update' : 'Save' }}</button>
+       <div class="modal-footer">
+         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+      <button class="btn btn-primary" (click)="saveTask()" [disabled]="isSaving">
+
+        <span *ngIf="!isSaving">{{ isEditing ? 'Update' : 'Save' }}</span>
+
+        <span *ngIf="isSaving">
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Processing...
+        </span>
+
+      </button>
+
       </div>
+
+      
+
     </div>
   </div>
 </div>

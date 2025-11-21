@@ -3,22 +3,18 @@
   <button class="btn btn-success" (click)="openAddModal('incentiveModal')">➕ Add Incentive</button>
 </div>
 
-<!-- 🔍 Search -->
 <div class="mb-3">
   <input class="form-control" placeholder="Search by employee or deal ID..."
          [(ngModel)]="searchText">
 </div>
 
-<!-- 🔄 Loader -->
 <div *ngIf="isLoading" class="text-center my-4">
   <div class="spinner-border text-primary"></div>
   <p class="text-muted mt-2">Loading incentives...</p>
 </div>
 
-<!-- ❌ Error -->
 <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-<!-- 🧾 Table -->
 <div *ngIf="!isLoading">
   <table class="table table-hover align-middle">
     <thead class="table-primary">
@@ -42,6 +38,7 @@
         <td>₹{{ it.amount | number }}</td>
         <td>{{ it.commissionPct }}%</td>
         <td>₹{{ it.computedPayout | number }}</td>
+
         <td>
           <span class="badge"
             [ngClass]="{
@@ -58,7 +55,6 @@
         </td>
       </tr>
 
-      <!-- Empty -->
       <tr *ngIf="incentives.length === 0">
         <td colspan="8" class="text-center text-muted py-3">
           No incentive records found.
@@ -68,7 +64,7 @@
   </table>
 </div>
 
-<!-- 🧩 Add Incentive Modal -->
+<!-- Modal -->
 <div class="modal fade" id="incentiveModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg">
@@ -82,10 +78,9 @@
         <form>
           <div class="row g-3">
 
-            <!-- Employee -->
             <div class="col-md-6">
               <label class="form-label">Employee</label>
-              <select class="form-select" [(ngModel)]="model.employee" name="employee" required>
+              <select class="form-select" [(ngModel)]="model.employee" name="employee">
                 <option value="">Select...</option>
                 <option *ngFor="let emp of employees" [value]="emp.name">
                   {{ emp.name }}
@@ -93,22 +88,19 @@
               </select>
             </div>
 
-            <!-- Deal ID -->
             <div class="col-md-6">
               <label class="form-label">Deal ID</label>
-              <input class="form-control" [(ngModel)]="model.dealId" name="dealId" required>
+              <input class="form-control" [(ngModel)]="model.dealId" name="dealId">
             </div>
 
-            <!-- Amount -->
             <div class="col-md-6">
               <label class="form-label">Amount (₹)</label>
-              <input type="number" class="form-control" [(ngModel)]="model.amount" name="amount" required>
+              <input type="number" class="form-control" [(ngModel)]="model.amount" name="amount">
             </div>
 
-            <!-- Commission -->
             <div class="col-md-6">
               <label class="form-label">Commission %</label>
-              <input type="number" class="form-control" [(ngModel)]="model.commissionPct" name="commissionPct" required>
+              <input type="number" class="form-control" [(ngModel)]="model.commissionPct" name="commissionPct">
             </div>
 
           </div>
@@ -119,17 +111,6 @@
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button class="btn btn-primary" (click)="add()">Save</button>
       </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- Toast -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="toastMessage" class="toast text-bg-primary border-0">
-    <div class="d-flex">
-      <div class="toast-body"></div>
-      <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
     </div>
   </div>
 </div>

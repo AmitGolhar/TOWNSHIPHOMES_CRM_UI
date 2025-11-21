@@ -1,0 +1,9 @@
+<div
+  class="toast-container"
+  [class.show]="visible"
+  *ngIf="message"
+>
+  <div class="toast-box" [ngClass]="message.type">
+    {{ message.text }}
+  </div>
+</div>

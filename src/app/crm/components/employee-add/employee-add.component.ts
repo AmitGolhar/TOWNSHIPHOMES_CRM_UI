@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Employee } from '@app/models/employee.model';
 import { EmployeeService } from '@app/services/employee.service';
+import { ROLE_GROUPS } from '@app/constants/role-groups.constant';
 
 @Component({
   selector: 'app-employee-add',
@@ -9,13 +10,19 @@ import { EmployeeService } from '@app/services/employee.service';
 })
 export class EmployeeAddComponent {
 
+  selectedRoles: string[] = [];
+  sendSimpleEmail: boolean = true;   // ⭐⭐ RESTORED EMAIL SEND FLAG
+
+  roleGroups = ROLE_GROUPS;
+ 
   employee: Employee = {
     name: '',
     email: '',
     phone: '',
     department: '',
     joiningDate: '',
-    companyEmail :''
+    companyEmail: '',
+    roles: ''
   };
 
   isSubmitting = false;
@@ -24,34 +31,52 @@ export class EmployeeAddComponent {
 
   constructor(private empService: EmployeeService) {}
 
+  toggleRole(role: string, event: any) {
+    if (event.target.checked) {
+      this.selectedRoles.push(role);
+    } else {
+      this.selectedRoles = this.selectedRoles.filter(r => r !== role);
+    }
+  }
+
   submitForm() {
+    if (this.isSubmitting) return;
+
     this.successMessage = '';
     this.errorMessage = '';
     this.isSubmitting = true;
 
-    this.empService.addEmployee(this.employee).subscribe({
-      next: (res) => {
-        this.successMessage =
-          "🎉 Employee added! Login account created and welcome email sent.";
+    // ⭐ Add Roles as CSV
+    this.employee.roles = this.selectedRoles.join(',');
 
-        // Reset form
+    // ⭐ Include email-send flag in request body
+    const payload = {
+      ...this.employee,
+      sendSimpleEmail: this.sendSimpleEmail   // RESTORED
+    };
+
+    this.empService.addEmployee(payload).subscribe({
+      next: () => {
+        this.successMessage = "🎉 Employee added successfully.";
+
         this.employee = {
           name: '',
           email: '',
           phone: '',
           department: '',
           joiningDate: '',
-          companyEmail:''
+          companyEmail: '',
+          roles: ''
         };
+
+        this.selectedRoles = [];
+        this.sendSimpleEmail = true;
 
         this.isSubmitting = false;
       },
+
       error: (err) => {
-        console.error(err);
-
-        this.errorMessage =
-          err.error?.error ?? "❌ Failed to add employee.";
-
+        this.errorMessage = err.error?.error ?? "❌ Failed to add employee.";
         this.isSubmitting = false;
       }
     });

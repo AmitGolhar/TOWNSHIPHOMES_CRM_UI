@@ -42,13 +42,18 @@
     <tr *ngFor="let p of filteredPayments; let i = index">
       <td>{{ i + 1 }}</td>
       <td>{{ p.clientName }}</td>
-      <td>{{ p.clientPhone || '—' }}</td>
+      <td>
+        <a *ngIf="p.clientPhone" [href]="'tel:' + p.clientPhone" class="text-decoration-none text-primary fw-bold">
+          {{ p.clientPhone }}
+        </a>
+
+        <span *ngIf="!p.clientPhone">—</span>
+      </td>
       <td>{{ p.propertyName || '—' }}</td>
       <td>{{ formatAmount(p.paidAmount) }}</td>
       <td>{{ formatAmount(p.pendingAmount) }}</td>
       <td>
-        <span class="badge"
-              [ngClass]="{
+        <span class="badge" [ngClass]="{
                 'bg-warning text-dark': p.status === 'Pending',
                 'bg-info text-dark': p.status === 'Partial',
                 'bg-success': p.status === 'Paid'
@@ -71,10 +76,12 @@
 </div>
 <!-- 🔹 Toast Notification -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1200;">
-  <div id="toastMessage" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+  <div id="toastMessage" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive"
+    aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body">Message</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+        aria-label="Close"></button>
     </div>
   </div>
 </div>

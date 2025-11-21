@@ -10,17 +10,19 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-marketing-outreach',
   templateUrl: './marketing-outreach.component.html',
-  styleUrls: ['./marketing-outreach.component.css']
+  styleUrls: ['./marketing-outreach.component.css'],
 })
 export class MarketingOutreachComponent implements OnInit {
   marketingTasks: MarketingTask[] = [];
-  employees: Employee[] = [];  // ✅ employee list dropdown
+  employees: Employee[] = []; // ✅ employee list dropdown
 
   selectedTask: MarketingTask = this.initTask();
   searchText = '';
   isEditing = false;
   isLoading = false;
   errorMessage = '';
+  isSaving = false;
+  employeeMap: any = {};
 
   taskTypes: string[] = [
     'Campaign Follow-Up',
@@ -30,7 +32,7 @@ export class MarketingOutreachComponent implements OnInit {
     'Creative / Brochure Design',
     'Email / SMS Blast',
     'Ad Budget Optimization',
-    'Performance Reporting'
+    'Performance Reporting',
   ];
 
   platforms: string[] = [
@@ -41,26 +43,34 @@ export class MarketingOutreachComponent implements OnInit {
     'YouTube',
     'Housing.com',
     '99acres',
-    'Offline Event'
+    'Offline Event',
   ];
 
   statuses: string[] = ['Pending', 'In Progress', 'Completed'];
 
   constructor(
     private marketingService: MarketingService,
-    private employeeService: EmployeeService  // ✅ inject employee service
+    private employeeService: EmployeeService // ✅ inject employee service
   ) {}
 
   ngOnInit(): void {
     this.loadTasks();
-    this.loadEmployees();   // ✅ load employee list
+    this.loadEmployees(); // ✅ load employee list
   }
 
   // 🔹 Load employees
   loadEmployees(): void {
     this.employeeService.getAllEmployees().subscribe({
-      next: (data) => (this.employees = data),
-      error: () => console.error("Failed to load employees")
+      next: (data) => {
+        this.employees = data || [];
+
+        // 🔥 Create ID → Name map
+        this.employeeMap = {};
+        this.employees.forEach((emp) => {
+          this.employeeMap[String(emp.id)] = emp.name;
+        });
+      },
+      error: () => console.error('Failed to load employees'),
     });
   }
 
@@ -68,11 +78,12 @@ export class MarketingOutreachComponent implements OnInit {
   loadTasks(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.marketingService.getAll()
+    this.marketingService
+      .getAll()
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (tasks) => (this.marketingTasks = tasks),
-        error: () => (this.errorMessage = '⚠️ Failed to load marketing tasks.')
+        error: () => (this.errorMessage = '⚠️ Failed to load marketing tasks.'),
       });
   }
 
@@ -87,44 +98,56 @@ export class MarketingOutreachComponent implements OnInit {
     this.selectedTask = { ...task };
     new bootstrap.Modal(document.getElementById('marketingModal')).show();
   }
+  saveTask(): void {
+    if (this.isSaving) return; // ⛔ block double click
+    this.isSaving = true;
 
-saveTask(): void {
-  const modalEl = document.getElementById('marketingModal');
-  const modal = bootstrap.Modal.getInstance(modalEl);
+    const modalEl = document.getElementById('marketingModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
 
-  // 🔥 Ensure assignedTo = employeeId
-  const assignedEmployee = this.employees.find(
-    e => String(e.id) === String(this.selectedTask.assignedTo)
-  );
+    // 🔥 Ensure assignedTo = employeeId
+    const assignedEmployee = this.employees.find(
+      (e) => String(e.id) === String(this.selectedTask.assignedTo)
+    );
 
-  const payload = {
-    ...this.selectedTask,
-    assignedTo: assignedEmployee ? String(assignedEmployee.id) : this.selectedTask.assignedTo
-  };
+    const payload = {
+      ...this.selectedTask,
+      assignedTo: assignedEmployee
+        ? String(assignedEmployee.id)
+        : this.selectedTask.assignedTo,
+    };
 
-  const op = this.isEditing
-    ? this.marketingService.update(payload)
-    : this.marketingService.add(payload);
+    const op = this.isEditing
+      ? this.marketingService.update(payload)
+      : this.marketingService.add(payload);
 
-  op.subscribe({
-    next: () => {
-      this.showToast(this.isEditing ? 'Task updated successfully' : 'Task added successfully');
-      modal?.hide();
-      this.loadTasks();
-    },
-    error: () => this.showToast('❌ Failed to save task')
-  });
-}
+    op.subscribe({
+      next: () => {
+        this.showToast(
+          this.isEditing
+            ? '✅ Task updated successfully'
+            : '🎯 Task added successfully'
+        );
 
+        modal?.hide();
+        this.loadTasks();
+        this.isSaving = false;
+      },
+      error: () => {
+        this.showToast('❌ Failed to save task');
+        this.isSaving = false;
+      },
+    });
+  }
 
   deleteTask(id?: number): void {
-    if (id && confirm("Delete this task?")) {
+    if (id && confirm('Delete this task?')) {
       this.marketingService.delete(id).subscribe({
         next: () => {
-          this.showToast("🗑️ Task deleted");
+          this.showToast('🗑️ Task deleted');
           this.loadTasks();
         },
-        error: () => this.showToast("❌ Failed to delete task")
+        error: () => this.showToast('❌ Failed to delete task'),
       });
     }
   }
@@ -137,7 +160,7 @@ saveTask(): void {
       assignedTo: '',
       status: 'Pending',
       dueDate: '',
-      notes: ''
+      notes: '',
     };
   }
 

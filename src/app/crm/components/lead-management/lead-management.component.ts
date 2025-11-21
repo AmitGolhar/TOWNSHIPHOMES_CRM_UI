@@ -35,6 +35,8 @@ export class LeadManagementComponent implements OnInit {
 
   statuses: string[] = ['Pending', 'In Progress', 'Completed'];
   employees: Employee[] = [];
+isSaving = false;
+
 
   constructor(
     private leadService: LeadService,
@@ -81,51 +83,54 @@ export class LeadManagementComponent implements OnInit {
     if (modal) new bootstrap.Modal(modal).show();
   }
 
-  // ✅ Save Task (Create / Update)
   saveTask(): void {
-    const modalEl = document.getElementById('leadModal');
-    const modal = bootstrap.Modal.getInstance(modalEl!);
 
-    // ⚠ Ensure assignedTo is employeeId
-    const assignedEmployee = this.employees.find(
-      (e) => String(e.id) === String(this.selectedTask.assignedTo)
-    );
+  if (this.isSaving) return; // ⛔ Prevent double click
+  this.isSaving = true;
 
-    if (!assignedEmployee) {
-      console.warn(
-        '⚠ Invalid assignedTo. No employee matched with ID:',
-        this.selectedTask.assignedTo
+  const modalEl = document.getElementById('leadModal');
+  const modal = bootstrap.Modal.getInstance(modalEl!);
+
+  // 🔥 Fix assignedTo → employeeId
+  const assignedEmployee = this.employees.find(
+    e => String(e.id) === String(this.selectedTask.assignedTo)
+  );
+
+  const payload = {
+    ...this.selectedTask,
+    assignedTo: assignedEmployee ? String(assignedEmployee.id) : this.selectedTask.assignedTo
+  };
+
+  const request$ = this.isEditing
+    ? this.leadService.updateLead(payload)
+    : this.leadService.addLead(payload);
+
+  request$.subscribe({
+    next: () => {
+      this.showToast(
+        this.isEditing
+          ? "✅ Lead task updated successfully"
+          : "🎯 Lead task added successfully"
       );
+      modal?.hide();
+      this.loadLeads();
+      this.isSaving = false;
+    },
+    error: () => {
+      this.showToast("❌ Failed to save lead task. Try again.");
+      this.isSaving = false;
     }
+  });
+}
 
-    // Ensure payload contains employeeId only
-    const payload = {
-      ...this.selectedTask,
-      assignedTo: assignedEmployee
-        ? String(assignedEmployee.id)
-        : this.selectedTask.assignedTo,
-    };
-
-    if (this.isEditing) {
-      // ----- UPDATE -----
-      this.leadService.updateLead(payload).subscribe({
-        next: () => {
-          this.loadLeads();
-          modal?.hide();
-        },
-        error: (err) => console.error('Error updating lead:', err),
-      });
-    } else {
-      // ----- ADD -----
-      this.leadService.addLead(payload).subscribe({
-        next: () => {
-          this.loadLeads();
-          modal?.hide();
-        },
-        error: (err) => console.error('Error adding lead:', err),
-      });
-    }
+showToast(message: string): void {
+  const toastEl = document.getElementById('toastMessage');
+  if (toastEl) {
+    toastEl.querySelector('.toast-body')!.textContent = message;
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
   }
+}
 
   // ✅ Delete Lead
   deleteTask(id?: number): void {

@@ -42,7 +42,7 @@
         <td>{{ task.propertyName }}</td>
         <td>{{ task.propertyCode || '-' }}</td>
         <td>{{ task.location }}</td>
-        <td>{{ task.assignedTo }}</td>
+        <td>{{ employeeMap[task.assignedTo] || '-' }}</td>
         <td>
           <span class="badge" [ngClass]="{
               'bg-warning text-dark': task.status === 'Pending',
@@ -117,7 +117,7 @@
                 <option value="">Select Employee...</option>
 
                 <option *ngFor="let emp of employees" [value]="emp.id">
-                  {{ emp.name }}  
+                  {{ emp.name }}
                 </option>
               </select>
             </div>
@@ -147,9 +147,19 @@
         <button class="btn btn-secondary" data-bs-dismiss="modal">
           Cancel
         </button>
-        <button class="btn btn-primary" (click)="saveTask()" [disabled]="isLoading">
-          {{ isEditing ? 'Update' : 'Save' }}
+        <button class="btn btn-primary" (click)="saveTask()" [disabled]="isSaving">
+
+          <span *ngIf="!isSaving">
+            {{ isEditing ? 'Update' : 'Save' }}
+          </span>
+
+          <span *ngIf="isSaving">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Processing...
+          </span>
+
         </button>
+
       </div>
     </div>
   </div>

@@ -2,13 +2,15 @@ import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 import { FinanceService } from '../services/finance.service';
 import { Subscription } from 'rxjs';
-
+import { UiToastService } from '@app/services/ui-toast.service';
+ 
 @Component({
   selector: 'app-revenue-dashboard',
   templateUrl: './revenue-dashboard.component.html',
   styleUrls: ['./revenue-dashboard.component.css']
 })
 export class RevenueDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+
   monthly: any[] = [];
   byAgent: any[] = [];
   barChart?: Chart;
@@ -16,41 +18,52 @@ export class RevenueDashboardComponent implements OnInit, AfterViewInit, OnDestr
   loading = true;
   refreshSub?: Subscription;
 
-  constructor(private svc: FinanceService) {}
+  constructor(
+    private svc: FinanceService,
+    private toast: UiToastService       // ✅ GLOBAL TOAST
+  ) {}
 
   ngOnInit(): void {
-    // Subscribe to real-time data updates from FinanceService
     this.refreshSub = this.svc.getRevenue().subscribe({
       next: (data) => {
-        this.monthly = data.monthly;
-        this.byAgent = data.byAgent;
+        if (!data) {
+          this.toast.error("⚠️ No revenue data received");
+          this.loading = false;
+          return;
+        }
+        this.monthly = data.monthly || [];
+        this.byAgent = data.byAgent || [];
+
         this.loading = false;
         this.buildCharts();
       },
       error: (err) => {
-        console.error('Error fetching revenue data:', err);
         this.loading = false;
+        this.toast.error("❌ Failed to load revenue data");
+        console.error('Revenue API Error:', err);
       }
     });
   }
 
-  ngAfterViewInit(): void {
-    // handled after data load
-  }
+  ngAfterViewInit(): void {}
 
   buildCharts(): void {
-    // Ensure DOM is ready
-    setTimeout(() => {
-      this.buildBarChart();
-      this.buildPieChart();
-    }, 0);
+    try {
+      setTimeout(() => {
+        this.buildBarChart();
+        this.buildPieChart();
+      }, 0);
+      this.toast.info("📊 Charts refreshed");
+    } catch (e) {
+      this.toast.error("❌ Failed to refresh charts");
+      console.error(e);
+    }
   }
 
   private buildBarChart(): void {
     const ctx = document.getElementById('revBar') as HTMLCanvasElement;
     if (!ctx) return;
 
-    // Destroy existing chart if it exists
     if (this.barChart) this.barChart.destroy();
 
     const config: ChartConfiguration<'bar'> = {
@@ -72,19 +85,7 @@ export class RevenueDashboardComponent implements OnInit, AfterViewInit, OnDestr
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: { title: { display: true, text: 'Month' } },
-          y: { title: { display: true, text: 'Revenue (₹)' } }
-        },
-        plugins: {
-          legend: { position: 'bottom' },
-          tooltip: {
-            callbacks: {
-              label: (context) => `₹${context.formattedValue}`
-            }
-          }
-        }
+        maintainAspectRatio: false
       }
     };
 
@@ -104,32 +105,22 @@ export class RevenueDashboardComponent implements OnInit, AfterViewInit, OnDestr
         datasets: [
           {
             data: this.byAgent.map(a => a.collected),
-            backgroundColor: ['#007bff', '#28a745', '#ffc107', '#17a2b8', '#6f42c1']
+            backgroundColor: [
+              '#007bff', '#28a745', '#ffc107', '#17a2b8', '#6f42c1'
+            ]
           }
         ]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom' },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const label = context.label || '';
-                const value = context.parsed || 0;
-                return `${label}: ₹${value.toLocaleString()}`;
-              }
-            }
-          }
-        }
+        maintainAspectRatio: false
       }
     });
   }
 
   ngOnDestroy(): void {
-    if (this.barChart) this.barChart.destroy();
-    if (this.pieChart) this.pieChart.destroy();
+    this.barChart?.destroy();
+    this.pieChart?.destroy();
     this.refreshSub?.unsubscribe();
   }
 }

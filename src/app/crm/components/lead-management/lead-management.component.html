@@ -21,7 +21,10 @@
         <th>Assigned To</th>
         <th>Status</th>
         <th>Due Date</th>
+        <th>Contact</th>
         <th>Actions</th>
+
+
       </tr>
     </thead>
 
@@ -44,6 +47,12 @@
         </td>
         <td>{{ task.dueDate | date: 'mediumDate' }}</td>
         <td>
+          <a *ngIf="task.contactNumber" [href]="'tel:' + task.contactNumber"
+            class="text-decoration-none text-primary fw-bold">
+            {{ task.contactNumber }}
+          </a>
+        </td>
+        <td>
           <button class="btn btn-sm btn-outline-primary me-1" (click)="openEditModal(task)" title="Edit Task">
             ✏️
           </button>
@@ -51,6 +60,8 @@
             🗑️
           </button>
         </td>
+
+
       </tr>
 
       <!-- 🕳️ Empty State -->
@@ -108,7 +119,7 @@
               <select class="form-select" [(ngModel)]="selectedTask.assignedTo" name="assignedTo">
                 <option value="">Select...</option>
                 <option *ngFor="let emp of employees" [value]="emp.id">
-                  {{ emp.name }} 
+                  {{ emp.name }}
                 </option>
               </select>
             </div>
@@ -136,9 +147,19 @@
 
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" (click)="saveTask()">
-          {{ isEditing ? 'Update' : 'Save' }}
+        <button class="btn btn-primary" (click)="saveTask()" [disabled]="isSaving">
+
+          <span *ngIf="!isSaving">
+            {{ isEditing ? 'Update' : 'Save' }}
+          </span>
+
+          <span *ngIf="isSaving">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Processing...
+          </span>
+
         </button>
+
       </div>
     </div>
   </div>

@@ -20,6 +20,7 @@ export class ClientInteractionComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   searchText = '';
+employeeMap: any = {};
 
   taskTypes: string[] = [
     'Site Visit Scheduling',
@@ -35,7 +36,8 @@ export class ClientInteractionComponent implements OnInit {
   ];
 
   statuses: string[] = ['Pending', 'In Progress', 'Completed'];
-loading = true;
+  loading = true;
+  isSaving = false;
 
   constructor(
     private clientService: ClientService,
@@ -43,21 +45,29 @@ loading = true;
   ) {}
 
   ngOnInit(): void {
-
-      setTimeout(() => {
-    this.loading = false; // hide loader
-  }, 1200);
+    setTimeout(() => {
+      this.loading = false; // hide loader
+    }, 1200);
     this.loadTasks();
     this.loadEmployees(); // ✅ Load employee list on init
   }
 
   // 🔹 Load all employees
-  loadEmployees(): void {
-    this.employeeService.getAllEmployees().subscribe({
-      next: (list) => (this.employees = list),
-      error: () => console.error('Failed to load employees'),
-    });
-  }
+loadEmployees(): void {
+  this.employeeService.getAllEmployees().subscribe({
+    next: (list) => {
+      this.employees = list || [];
+
+      // 🔥 Create ID → NAME map
+      this.employeeMap = {};
+      this.employees.forEach(emp => {
+        this.employeeMap[String(emp.id)] = emp.name;
+      });
+    },
+    error: () => console.error('Failed to load employees'),
+  });
+}
+
 
   // 🔹 Load all client tasks
   loadTasks(): void {
@@ -82,8 +92,10 @@ loading = true;
     this.selectedTask = { ...task };
     new bootstrap.Modal(document.getElementById('clientModal')).show();
   }
-
   saveTask(): void {
+    if (this.isSaving) return; // prevent double click
+    this.isSaving = true;
+
     const modalEl = document.getElementById('clientModal');
     const modal = bootstrap.Modal.getInstance(modalEl);
 
@@ -103,18 +115,20 @@ loading = true;
       ? this.clientService.update(payload)
       : this.clientService.add(payload);
 
-    operation.subscribe({
-      next: () => {
-        this.showToast(
-          this.isEditing
-            ? 'Task updated successfully ✅'
-            : 'Task added successfully 🎯'
-        );
-        modal?.hide();
-        this.loadTasks();
-      },
-      error: () => this.showToast('❌ Failed to save task.'),
-    });
+    operation
+      .pipe(finalize(() => (this.isSaving = false))) // 👈 RESET BUTTON
+      .subscribe({
+        next: () => {
+          this.showToast(
+            this.isEditing
+              ? 'Task updated successfully ✅'
+              : 'Task added successfully 🎯'
+          );
+          modal?.hide();
+          this.loadTasks();
+        },
+        error: () => this.showToast('❌ Failed to save task.'),
+      });
   }
 
   deleteTask(id?: number): void {

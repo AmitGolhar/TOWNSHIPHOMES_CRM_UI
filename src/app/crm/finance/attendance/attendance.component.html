@@ -7,8 +7,29 @@
     <span>{{ employeeName }}</span>
 
     <div class="ms-auto">
-      <button *ngIf="!isCheckedIn" class="btn btn-success" (click)="checkIn()">✅ Check-In</button>
-      <button *ngIf="isCheckedIn" class="btn btn-danger" (click)="checkOut()">🚪 Check-Out</button>
+
+      <!-- CHECK-IN BUTTON -->
+      <button 
+        *ngIf="!isCheckedIn" 
+        class="btn btn-success"
+        [disabled]="isProcessing"
+        (click)="checkIn()">
+
+        <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-1"></span>
+        ✅ Check-In
+      </button>
+
+      <!-- CHECK-OUT BUTTON -->
+      <button 
+        *ngIf="isCheckedIn" 
+        class="btn btn-danger"
+        [disabled]="isProcessing"
+        (click)="checkOut()">
+
+        <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-1"></span>
+        🚪 Check-Out
+      </button>
+
     </div>
   </div>
 
@@ -21,13 +42,28 @@
     </div>
 
     <div class="row mt-2">
-      <div class="col-md-3"><input type="number" class="form-control" placeholder="Visits done" [(ngModel)]="visits" (change)="updateMetrics()"></div>
-      <div class="col-md-3"><input type="number" class="form-control" placeholder="Tasks closed" [(ngModel)]="tasks" (change)="updateMetrics()"></div>
-      <div class="col-md-3"><strong>Total Hours:</strong> {{ todayRecord.totalHours || '-' }}</div>
+      <div class="col-md-3">
+        <input type="number" class="form-control"
+               placeholder="Visits done"
+               [(ngModel)]="visits"
+               (change)="updateMetrics()">
+      </div>
+
+      <div class="col-md-3">
+        <input type="number" class="form-control"
+               placeholder="Tasks closed"
+               [(ngModel)]="tasks"
+               (change)="updateMetrics()">
+      </div>
+
+      <div class="col-md-3">
+        <strong>Total Hours:</strong> {{ todayRecord.totalHours || '-' }}
+      </div>
     </div>
   </div>
 
   <h6>📅 Attendance History</h6>
+
   <table class="table table-sm mt-2 align-middle">
     <thead class="table-light">
       <tr>
@@ -41,6 +77,7 @@
         <th>Status</th>
       </tr>
     </thead>
+
     <tbody>
       <tr *ngFor="let r of records">
         <td>{{ r.date }}</td>
@@ -50,7 +87,17 @@
         <td>{{ r.visits || 0 }}</td>
         <td>{{ r.tasksClosed || 0 }}</td>
         <td>{{ r.totalHours || '-' }}</td>
-        <td><span [class.badge-success]="r.status==='Checked Out'" [class.badge-warning]="r.status==='Present'" class="badge">{{ r.status }}</span></td>
+
+        <td>
+          <span 
+            class="badge"
+            [ngClass]="{
+              'bg-success': r.status==='Checked Out',
+              'bg-warning text-dark': r.status==='Present'
+            }">
+            {{ r.status }}
+          </span>
+        </td>
       </tr>
     </tbody>
   </table>

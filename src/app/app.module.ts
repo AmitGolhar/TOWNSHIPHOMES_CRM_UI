@@ -16,7 +16,8 @@ import { ThemeService } from './services/theme.service';
 import { ExcelUploadComponent } from './components/excel-upload/excel-upload.component';
 import { EmployeeAddComponent } from './crm/components/employee-add/employee-add.component';
 import { EmployeeFilterPipe } from './pipes/employee-filter.pipe';
- 
+import { ApiInterceptor } from './core/api.interceptor';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -26,19 +27,24 @@ import { EmployeeFilterPipe } from './pipes/employee-filter.pipe';
     ThemeToggleComponent,
     ExcelUploadComponent,
     EmployeeAddComponent,
-    ],
+  ],
   imports: [
     BrowserModule,
     InfiniteScrollModule,
     FormsModule,
     AppRoutingModule,
     HttpClientModule,
-    SharedModule
+    SharedModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    ThemeService
+    ThemeService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiInterceptor,
+      multi: true,
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

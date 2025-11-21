@@ -3,12 +3,8 @@
 </div>
 
 <div class="mb-3">
-  <input
-    type="text"
-    class="form-control"
-    placeholder="Search employee by name, email or department..."
-    [(ngModel)]="searchText"
-  />
+  <input type="text" class="form-control" placeholder="Search employee by name, email or department..."
+    [(ngModel)]="searchText" />
 </div>
 
 <!-- Loader -->
@@ -34,13 +30,15 @@
   </thead>
 
   <tbody>
-    <tr
-      *ngFor="let emp of employees | filter: searchText; let i = index"
-    >
+    <tr *ngFor="let emp of employees | filter: searchText; let i = index">
       <td>{{ i + 1 }}</td>
       <td>{{ emp.name }}</td>
       <td>{{ emp.email }}</td>
-      <td>{{ emp.phone }}</td>
+      <td>
+        <a *ngIf="emp.phone" [href]="'tel:' + emp.phone" class="text-decoration-none text-primary fw-bold">
+          {{ emp.phone }}
+        </a>
+      </td>
       <td>{{ emp.department }}</td>
       <td>{{ emp.joiningDate | date: 'mediumDate' }}</td>
     </tr>

@@ -20,6 +20,7 @@ export class PropertyListingComponent implements OnInit {
   isEditing = false;
   isLoading = false;
   errorMessage = '';
+employeeMap: any = {};
 
   taskTypes: string[] = [
     'Property Onboarding',
@@ -30,6 +31,7 @@ export class PropertyListingComponent implements OnInit {
     'Price / Rent Update',
     'Inventory Check',
   ];
+isSaving = false; // ⬅️ Add this at top near isLoading
 
   statuses: string[] = ['Pending', 'In Progress', 'Completed'];
 
@@ -43,13 +45,21 @@ export class PropertyListingComponent implements OnInit {
     this.loadEmployees(); // 👈 LOAD EMPLOYEES
   }
 
-  /** 🔹 Load Employee List */
-  loadEmployees(): void {
-    this.employeeService.getAllEmployees().subscribe({
-      next: (data) => (this.employees = data || []),
-      error: (err) => console.error('❌ Failed to load employees:', err),
-    });
-  }
+loadEmployees(): void {
+  this.employeeService.getAllEmployees().subscribe({
+    next: (data) => {
+      this.employees = data || [];
+
+      // 🔥 Build ID → Name map
+      this.employeeMap = {};
+      this.employees.forEach(emp => {
+        this.employeeMap[String(emp.id)] = emp.name;
+      });
+    },
+    error: (err) => console.error('❌ Failed to load employees:', err),
+  });
+}
+
 
   /** 🔹 Load All Property Tasks */
   loadTasks(): void {
@@ -84,46 +94,60 @@ export class PropertyListingComponent implements OnInit {
     const modalEl = document.getElementById('propertyModal');
     if (modalEl) new bootstrap.Modal(modalEl).show();
   }
+saveTask(): void {
 
-  /** 🔹 Save or Update Task */
-  saveTask(): void {
-    if (
-      !this.selectedTask.propertyName?.trim() ||
-      !this.selectedTask.taskType
-    ) {
-      alert('Please fill all mandatory fields before saving.');
-      return;
-    }
+  if (this.isSaving) return; // ⛔ block double-submit
+  this.isSaving = true;
 
-    // 🔥 Ensure assignedTo = employeeId
-    const assignedEmployee = this.employees.find(
-      (e) => String(e.id) === String(this.selectedTask.assignedTo)
-    );
-
-    const payload = {
-      ...this.selectedTask,
-      assignedTo: assignedEmployee
-        ? String(assignedEmployee.id)
-        : this.selectedTask.assignedTo,
-    };
-
-    this.isLoading = true;
-
-    const request$ = this.isEditing
-      ? this.propertyService.update(payload)
-      : this.propertyService.add(payload);
-
-    request$.pipe(finalize(() => (this.isLoading = false))).subscribe({
-      next: () => {
-        this.loadTasks();
-        this.closeModal();
-      },
-      error: (err) => {
-        console.error('❌ Save/Update failed:', err);
-        alert('Error saving property task. Please try again.');
-      },
-    });
+  // Mandatory field check
+  if (!this.selectedTask.propertyName?.trim() || !this.selectedTask.taskType) {
+    this.showToast("⚠️ Please fill all mandatory fields.");
+    this.isSaving = false;
+    return;
   }
+
+  // Ensure assignedTo = employeeId
+  const assignedEmployee = this.employees.find(
+    (e) => String(e.id) === String(this.selectedTask.assignedTo)
+  );
+
+  const payload = {
+    ...this.selectedTask,
+    assignedTo: assignedEmployee
+      ? String(assignedEmployee.id)
+      : this.selectedTask.assignedTo,
+  };
+
+  const modalEl = document.getElementById('propertyModal');
+  const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+
+  const request$ = this.isEditing
+    ? this.propertyService.update(payload)
+    : this.propertyService.add(payload);
+
+  request$.pipe(finalize(() => this.isSaving = false)).subscribe({
+    next: () => {
+      this.showToast(
+        this.isEditing ? "✅ Task updated successfully" : "🎯 Task added successfully"
+      );
+      modal?.hide();
+      this.loadTasks();
+    },
+    error: () => {
+      this.showToast("❌ Failed to save task. Try again.");
+    }
+  });
+}
+
+
+showToast(message: string): void {
+  const toastEl = document.getElementById('toastMessage');
+  if (toastEl) {
+    toastEl.querySelector('.toast-body')!.textContent = message;
+    new bootstrap.Toast(toastEl).show();
+  }
+}
+
 
   /** 🔹 Delete a Task */
   deleteTask(id?: number): void {

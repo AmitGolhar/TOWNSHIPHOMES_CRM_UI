@@ -6,4 +6,6 @@ export interface Employee {
   department: string;
   joiningDate: string;
   companyEmail:string;
+      roles?:string;
+
 }

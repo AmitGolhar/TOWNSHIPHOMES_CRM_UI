@@ -4,18 +4,10 @@
     <h4 class="fw-bold text-primary mb-0">🏘 99 Acres Leads</h4>
 
     <div>
-      <input
-        type="file"
-        (change)="onFileChange($event)"
-        accept=".xls,.xlsx"
-        class="form-control d-inline-block"
-        style="width: 220px"
-      />
-      <button
-        class="btn btn-outline-success ms-2"
-        (click)="uploadLeads()"
-        [disabled]="isUploading || !excelData.length"
-      >
+      <input type="file" (change)="onFileChange($event)" accept=".xls,.xlsx" class="form-control d-inline-block"
+        style="width: 220px" />
+      <button class="btn btn-outline-success ms-2" (click)="uploadLeads()"
+        [disabled]="isUploading || !excelData.length">
         ⬆️ Upload Excel
       </button>
       <button class="btn btn-outline-secondary ms-2" (click)="clearData()">🧹 Clear</button>
@@ -63,7 +55,12 @@
           <td>{{ lead.propertyType }}</td>
           <td>{{ lead.leadDate }}</td>
           <td>{{ lead.leadName }}</td>
-          <td>{{ lead.leadPhoneNumber?.replace('(+91)-', '') }}</td>
+          <td>
+            <a [href]="'tel:' + (lead.leadPhoneNumber?.replace('(+91)-', '') || '')"
+              class="text-decoration-none text-primary fw-bold">
+              {{ lead.leadPhoneNumber?.replace('(+91)-', '') }}
+            </a>
+          </td>
           <td>{{ lead.leadEmail }}</td>
           <td>{{ lead.sellerName }}</td>
           <td>{{ lead.city }}</td>
@@ -78,18 +75,10 @@
             <span class="badge bg-secondary">{{ lead.secondary_lead_status }}</span>
           </td>
           <td>
-            <button
-              class="btn btn-sm btn-outline-primary me-1"
-              (click)="viewLead(lead)"
-              title="View Lead Details"
-            >
+            <button class="btn btn-sm btn-outline-primary me-1" (click)="viewLead(lead)" title="View Lead Details">
               👁️
             </button>
-            <button
-              class="btn btn-sm btn-outline-danger"
-              (click)="deleteLead(lead.id)"
-              title="Delete Lead"
-            >
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteLead(lead.id)" title="Delete Lead">
               🗑️
             </button>
           </td>
@@ -105,25 +94,14 @@
 </div>
 
 <!-- Lead Details Modal -->
-<div
-  class="modal fade"
-  id="leadModal"
-  tabindex="-1"
-  aria-labelledby="leadModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="leadModal" tabindex="-1" aria-labelledby="leadModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="leadModalLabel">
           Lead Details - {{ selectedLead?.leadName }}
         </h5>
-        <button
-          type="button"
-          class="btn-close btn-close-white"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
@@ -137,7 +115,14 @@
           <div class="col-md-6"><strong>City:</strong> {{ selectedLead?.city }}</div>
           <div class="col-md-6"><strong>Locality:</strong> {{ selectedLead?.locality }}</div>
           <div class="col-md-6"><strong>Email:</strong> {{ selectedLead?.leadEmail || 'N/A' }}</div>
-          <div class="col-md-6"><strong>Phone:</strong> {{ selectedLead?.leadPhoneNumber }}</div>
+          <div class="col-md-6">
+            <strong>Phone:</strong>
+            <a *ngIf="selectedLead?.leadPhoneNumber"
+              [href]="'tel:' + selectedLead.leadPhoneNumber.replace('(+91)-', '')"
+              class="text-decoration-none text-primary fw-bold">
+              {{ selectedLead.leadPhoneNumber }}
+            </a>
+          </div>
           <div class="col-md-6"><strong>Primary Status:</strong> {{ selectedLead?.primary_lead_status }}</div>
           <div class="col-md-6"><strong>Secondary Status:</strong> {{ selectedLead?.secondary_lead_status }}</div>
           <div class="col-md-6"><strong>Address:</strong> {{ selectedLead?.address }}</div>
