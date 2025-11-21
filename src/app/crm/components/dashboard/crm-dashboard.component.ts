@@ -26,6 +26,7 @@ export class CrmDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   upcomingTasks: MiniTask[] = [];
   overdueTasks: MiniTask[] = [];
   performers: Performer[] = [];
+  userRole: string = '';   
 
   // FINANCE STATS
   financeStats: any = {
@@ -82,6 +83,7 @@ export class CrmDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadUserInfo();
+        this.userRole = sessionStorage.getItem('role') || '';
 
     setTimeout(() => {
       this.loading = false;
@@ -453,5 +455,10 @@ export class CrmDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.financeStats?.monthlyRevenue
       ? this.financeStats.monthlyRevenue.reduce((a: any, b: any) => a + b, 0)
       : 0;
+  }
+
+
+   isAdmin(): boolean {
+    return this.userRole.toLowerCase().includes('ADMIN');
   }
 }

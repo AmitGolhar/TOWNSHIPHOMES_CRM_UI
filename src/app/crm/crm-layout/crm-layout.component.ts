@@ -7,7 +7,11 @@ import { Component, HostListener } from '@angular/core';
 })
 export class CrmLayoutComponent {
   menuOpen = false;
+  userRole: string = '';   
 
+
+
+  
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
   }
@@ -29,5 +33,11 @@ export class CrmLayoutComponent {
 
   ngOnInit(): void {
     this.menuOpen = window.innerWidth >= 992;
+        this.userRole = sessionStorage.getItem('role') || '';
+
+  }
+
+  isAdmin(): boolean {
+    return this.userRole.toLowerCase().includes('ADMIN');
   }
 }

@@ -39,9 +39,9 @@
                         (click)="closeMenu()">📣 Marketing & Outreach</a></li>
                 <li class="nav-item"><a routerLink="legal-documentation" routerLinkActive="active" class="nav-link"
                         (click)="closeMenu()">📑 Legal & Documentation</a></li>
-                <li class="nav-item"><a routerLink="client-support" routerLinkActive="active" class="nav-link"
+                <li class="nav-item"><a routerLink="client-support" routerLinkActive="active" class="nav-link" 
                         (click)="closeMenu()">🧰 Client Support & After Sales</a></li>
-                <li class="nav-item"><a routerLink="admin-internal" routerLinkActive="active" class="nav-link"
+                <li class="nav-item"><a routerLink="admin-internal" routerLinkActive="active" class="nav-link" *ngIf="isAdmin()"
                         (click)="closeMenu()">🏢 Admin & Internal</a></li>
                 <li class="nav-item"><a routerLink="custom-smart" routerLinkActive="active" class="nav-link"
                         (click)="closeMenu()">🤖 Custom / Smart Tasks</a></li>
@@ -49,13 +49,13 @@
                         (click)="closeMenu()">💰 Payments</a></li>
                 <li class="nav-item"><a routerLink="payments/add" routerLinkActive="active" class="nav-link"
                         (click)="closeMenu()">➕ Payments Add</a></li>
-                <li class="nav-item"><a routerLink="finance/revenue" routerLinkActive="active" class="nav-link"
+                <li class="nav-item"><a routerLink="finance/revenue" routerLinkActive="active" class="nav-link" *ngIf="isAdmin()"
                         (click)="closeMenu()">📈 Revenue</a></li>
                 <li class="nav-item"><a routerLink="finance/attendance" routerLinkActive="active" class="nav-link"
                         (click)="closeMenu()">🕒 Attendance</a></li>
-                <li class="nav-item"><a routerLink="finance/incentives" routerLinkActive="active" class="nav-link"
+                <li class="nav-item"><a routerLink="finance/incentives" routerLinkActive="active" class="nav-link" *ngIf="isAdmin()"
                         (click)="closeMenu()">🎯 Incentives</a></li>
-                <li class="nav-item"><a routerLink="finance/expenses" routerLinkActive="active" class="nav-link"
+                <li class="nav-item"><a routerLink="finance/expenses" routerLinkActive="active" class="nav-link" *ngIf="isAdmin()"
                         (click)="closeMenu()">💳 Expenses</a></li>
                 <li class="nav-item"><a routerLink="tasks" routerLinkActive="active" class="nav-link"
                         (click)="closeMenu()">📋

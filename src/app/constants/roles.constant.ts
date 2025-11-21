@@ -134,4 +134,5 @@ export const ROLES = {
   VP_SALES: 'VP_SALES',
   VP_OPERATIONS: 'VP_OPERATIONS',
   VP_LEGAL: 'VP_LEGAL',
+    ADMIN: 'ADMIN',
 };

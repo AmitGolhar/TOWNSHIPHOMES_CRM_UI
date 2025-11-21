@@ -146,5 +146,6 @@ export const ROLE_GROUPS = {
     ROLES.VP_SALES,
     ROLES.VP_OPERATIONS,
     ROLES.VP_LEGAL,
+     ROLES.ADMIN,
   ]
 };
