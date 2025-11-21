@@ -35,7 +35,7 @@
         <td>{{ task.taskType }}</td>
         <td>{{ task.leadName }}</td>
         <td>{{ task.propertyName || '-' }}</td>
-        <td>{{ task.assignedTo || '-' }}</td>
+        <td>{{ getEmployeeName(task.assignedTo) }}</td>
         <td>
           <span class="badge" [ngClass]="{
               'bg-warning text-dark': task.status === 'Pending',

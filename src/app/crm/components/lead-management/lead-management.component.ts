@@ -37,6 +37,7 @@ export class LeadManagementComponent implements OnInit {
   employees: Employee[] = [];
 isSaving = false;
 
+employeeMap: any = {};
 
   constructor(
     private leadService: LeadService,
@@ -60,12 +61,24 @@ isSaving = false;
     });
   }
 
-  loadEmployees() {
-    this.employeeService.getAllEmployees().subscribe({
-      next: (res) => (this.employees = res),
-      error: (err) => console.error('Error loading employees:', err),
-    });
-  }
+loadEmployees() {
+  this.employeeService.getAllEmployees().subscribe({
+    next: (list) => {
+      this.employees = list || [];
+
+      // 🔥 Create quick lookup map (id → name)
+      this.employeeMap = {};
+      this.employees.forEach(emp => {
+        this.employeeMap[String(emp.id)] = emp.name;
+      });
+    },
+    error: (err) => console.error("Error loading employees", err)
+  });
+}
+getEmployeeName(id: string) {
+  return this.employeeMap[id] || id || "-";
+}
+
 
   // ✅ Open Add Modal
   openAddModal(): void {

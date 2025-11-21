@@ -16,21 +16,53 @@
   <form (ngSubmit)="submitMessage()" class="mt-3">
 
     <label class="form-label fw-semibold">Paste 99acres Lead Message</label>
-    <textarea class="form-control"
-              rows="7"
-              [(ngModel)]="rawMessage"
-              name="rawMessage"
-              placeholder="Paste 99acres message here..."
-              required></textarea>
+   <textarea class="form-control"
+          rows="7"
+          [(ngModel)]="rawMessage"
+          (ngModelChange)="onRawMessageChange()"
+          name="rawMessage"
+          placeholder="Paste 99acres message here..."
+          required></textarea>
 
-    <button class="btn btn-primary w-100 mt-3" [disabled]="isSubmitting">
-      <span *ngIf="!isSubmitting">📩 Save Lead</span>
 
-      <span *ngIf="isSubmitting">
-        <span class="spinner-border spinner-border-sm me-2"></span>
-        Processing...
-      </span>
-    </button>
+    <div class="row mt-3">
+
+      <div class="col-md-6">
+        <label class="form-label">Assigned To</label>
+        <select class="form-select" [(ngModel)]="selectedTask.assignedTo" name="assignedTo">
+          <option value="">Select...</option>
+          <option *ngFor="let emp of employees" [value]="emp.id">
+            {{ emp.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Task Type</label>
+        <select class="form-select" [(ngModel)]="selectedTask.taskType" name="taskType">
+          <option *ngFor="let type of taskTypes">
+            {{ type }}
+          </option>
+        </select>
+      </div>
+
+    </div>
+
+
+<button class="btn btn-primary w-100 mt-3" (click)="submitMessage()" [disabled]="isSaving">
+
+  <span *ngIf="!isSaving">
+    📩 Save Lead
+  </span>
+
+  <span *ngIf="isSaving">
+    <span class="spinner-border spinner-border-sm me-2"></span>
+    {{ saveMessage }}
+  </span>
+
+</button>
+
+
   </form>
 
   <!-- Divider -->

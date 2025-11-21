@@ -11,9 +11,10 @@ export class WhatsAppLead99acresService {
 
   constructor(private http: HttpClient) {}
 
-  saveLeadMessage(message: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/save`, { message });
-  }
+ 
+saveLeadMessage(data: any) {
+  return this.http.post(`${this.baseUrl}/save`, data);
+}
 
   getLeadList(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/list`);
