@@ -25,6 +25,7 @@ import { EmployeeAddComponent } from './components/employee-add/employee-add.com
 import { EmployeeListComponent } from './components/employee-list/employee-list.component';
 import { HousingWhatsAppComponent } from './components/housing-whatsapp/housing-whatsapp.component';
 import { Acres99WhatsAppComponent } from './components/acres99-whatsapp/acres99-whatsapp.component';
+import { ServiceTicketsComponent } from './components/service-tickets/service-tickets.component';
 
 const routes: Routes = [
   {
@@ -64,7 +65,8 @@ const routes: Routes = [
       { path: 'add', component: EmployeeAddComponent },
       { path: 'list', component: EmployeeListComponent },
       { path: 'housing-whatsapp', component: HousingWhatsAppComponent },
-        { path: 'acres99-whatsapp', component: Acres99WhatsAppComponent },
+      { path: 'acres99-whatsapp', component: Acres99WhatsAppComponent },
+      { path: 'service-tickets', component: ServiceTicketsComponent },
 
       { path: '**', redirectTo: 'dashboard' },
     ],

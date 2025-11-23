@@ -28,7 +28,7 @@ export class FinanceService {
   private attendance$ = new BehaviorSubject<AttendanceRecord[]>([]);
   private incentives$ = new BehaviorSubject<any[]>([]);
   private expenses$ = new BehaviorSubject<any[]>([]);
-
+ 
   // ✅ Mock Data
   private mockPayments: Payment[] = [
     { id: 1, clientName: 'Rahul Khanna', clientPhone: '9876543210', propertyName: 'Skyline Residency', totalAmount: 1200000, paidAmount: 800000, pendingAmount: 400000, status: 'Partial', nextDueDate: '2025-10-25', notes: 'Next installment pending' },
@@ -70,6 +70,11 @@ export class FinanceService {
     this.incentives$.next(this.mockIncentives);
     this.expenses$.next(this.mockExpenses);
   }
+
+  getEmployeeRevenue() {
+  return this.http.get<any[]>(`${this.apiUrl}/payment-records/employee-revenue`);
+}
+
 
   /** ====================== ✅ Attendance ====================== */
   getAttendance(): Observable<AttendanceRecord[]> {

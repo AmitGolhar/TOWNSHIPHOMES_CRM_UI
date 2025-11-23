@@ -12,24 +12,29 @@ export class CrmLayoutComponent {
 
 
   
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
-  }
+toggleMenu(): void {
+  this.menuOpen = !this.menuOpen;
+}
 
-  closeMenu(): void {
-    if (window.innerWidth < 992) {
-      this.menuOpen = false;
-    }
+closeMenu(): void {
+  if (window.innerWidth < 992) {
+    this.menuOpen = false;
   }
+}
 
-  @HostListener('window:resize')
-  onResize(): void {
-    if (window.innerWidth >= 992) {
-      this.menuOpen = true;  // Keep sidebar visible on desktop
-    } else {
-      this.menuOpen = false; // Hide it on mobile
-    }
+
+
+
+ @HostListener('window:resize')
+onResize(): void {
+  if (window.innerWidth >= 992) {
+    this.menuOpen = true;    // keep open on desktop
+    document.body.style.overflow = '';
+  } else {
+    this.menuOpen = false;   // hide on mobile
   }
+}
+
 
   ngOnInit(): void {
     this.menuOpen = window.innerWidth >= 992;
@@ -37,7 +42,8 @@ export class CrmLayoutComponent {
 
   }
 
-  isAdmin(): boolean {
-    return this.userRole.toLowerCase().includes('ADMIN');
-  }
+ isAdmin(): boolean {
+  return this.userRole.toUpperCase().includes('ADMIN');
+}
+
 }

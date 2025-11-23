@@ -4,7 +4,7 @@
       {{ isEditMode ? '✏️ Edit Payment Record' : '➕ Add Payment Record' }}
     </h5>
 
-    <a  (click)="goBack()" class="btn btn-sm btn-outline-secondary">
+    <a (click)="goBack()" class="btn btn-sm btn-outline-secondary">
       ← Back to List
     </a>
   </div>
@@ -21,13 +21,8 @@
 
       <div class="col-md-6">
         <label class="form-label fw-semibold">Client Name <span class="text-danger">*</span></label>
-        <input
-          class="form-control"
-          [(ngModel)]="payment.clientName"
-          name="clientName"
-          required
-          placeholder="Enter client name"
-        />
+        <input class="form-control" [(ngModel)]="payment.clientName" name="clientName" required
+          placeholder="Enter client name" />
         <div *ngIf="paymentForm.submitted && !payment.clientName" class="text-danger small mt-1">
           Client name is required.
         </div>
@@ -35,25 +30,14 @@
 
       <div class="col-md-6">
         <label class="form-label fw-semibold">Property</label>
-        <input
-          class="form-control"
-          [(ngModel)]="payment.propertyName"
-          name="propertyName"
-          placeholder="Enter property name"
-        />
+        <input class="form-control" [(ngModel)]="payment.propertyName" name="propertyName"
+          placeholder="Enter property name" />
       </div>
 
       <div class="col-md-4">
         <label class="form-label fw-semibold">Total Amount <span class="text-danger">*</span></label>
-        <input
-          type="number"
-          class="form-control"
-          [(ngModel)]="payment.totalAmount"
-          name="totalAmount"
-          (input)="calculatePending()"
-          required
-          placeholder="e.g. 1200000"
-        />
+        <input type="number" class="form-control" [(ngModel)]="payment.totalAmount" name="totalAmount"
+          (input)="calculatePending()" required placeholder="e.g. 1200000" />
         <div *ngIf="paymentForm.submitted && !payment.totalAmount" class="text-danger small mt-1">
           Total amount is required.
         </div>
@@ -61,54 +45,29 @@
 
       <div class="col-md-4">
         <label class="form-label fw-semibold">Paid Amount</label>
-        <input
-          type="number"
-          class="form-control"
-          [(ngModel)]="payment.paidAmount"
-          name="paidAmount"
-          (input)="calculatePending()"
-          placeholder="e.g. 800000"
-        />
+        <input type="number" class="form-control" [(ngModel)]="payment.paidAmount" name="paidAmount"
+          (input)="calculatePending()" placeholder="e.g. 800000" />
       </div>
 
       <div class="col-md-4">
         <label class="form-label fw-semibold">Pending Amount</label>
-        <input
-          type="number"
-          class="form-control bg-light"
-          [(ngModel)]="payment.pendingAmount"
-          name="pendingAmount"
-          readonly
-        />
+        <input type="number" class="form-control bg-light" [(ngModel)]="payment.pendingAmount" name="pendingAmount"
+          readonly />
       </div>
 
       <div class="col-md-4">
         <label class="form-label fw-semibold">Status</label>
-        <input
-          class="form-control bg-light"
-          [(ngModel)]="payment.status"
-          name="status"
-          readonly
-        />
+        <input class="form-control bg-light" [(ngModel)]="payment.status" name="status" readonly />
       </div>
 
       <div class="col-md-4">
         <label class="form-label fw-semibold">Next Due Date</label>
-        <input
-          type="date"
-          class="form-control"
-          [(ngModel)]="payment.nextDueDate"
-          name="nextDueDate"
-        />
+        <input type="date" class="form-control" [(ngModel)]="payment.nextDueDate" name="nextDueDate" />
       </div>
 
       <div class="col-md-4">
         <label class="form-label fw-semibold">Payment Mode</label>
-        <select
-          class="form-select"
-          [(ngModel)]="payment.paymentMode"
-          name="paymentMode"
-        >
+        <select class="form-select" [(ngModel)]="payment.paymentMode" name="paymentMode">
           <option value="">Select</option>
           <option>Cash</option>
           <option>Cheque</option>
@@ -119,35 +78,31 @@
 
       <div class="col-md-6">
         <label class="form-label fw-semibold">Client Phone</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="payment.clientPhone"
-          name="clientPhone"
-          maxlength="10"
-          placeholder="e.g. 9876543210"
-        />
+        <input type="text" class="form-control" [(ngModel)]="payment.clientPhone" name="clientPhone" maxlength="10"
+          placeholder="e.g. 9876543210" />
       </div>
 
       <div class="col-md-6">
         <label class="form-label fw-semibold">Payment Date</label>
-        <input
-          type="date"
-          class="form-control"
-          [(ngModel)]="payment.paymentDate"
-          name="paymentDate"
-        />
+        <input type="date" class="form-control" [(ngModel)]="payment.paymentDate" name="paymentDate" />
       </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Assigned To (Email)</label>
+        <input class="form-control bg-light" [(ngModel)]="payment.assignedTo" name="assignedTo" readonly />
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Assigned Employee Name</label>
+        <input class="form-control bg-light" [(ngModel)]="payment.assignedEmployeeName" name="assignedEmployeeName"
+          readonly />
+      </div>
+
+
 
       <div class="col-12">
         <label class="form-label fw-semibold">Notes</label>
-        <textarea
-          class="form-control"
-          rows="2"
-          [(ngModel)]="payment.notes"
-          name="notes"
-          placeholder="Add any relevant notes here..."
-        ></textarea>
+        <textarea class="form-control" rows="2" [(ngModel)]="payment.notes" name="notes"
+          placeholder="Add any relevant notes here..."></textarea>
       </div>
     </div>
 
@@ -156,7 +111,7 @@
       <button class="btn btn-primary px-4">
         {{ isEditMode ? '💾 Update Payment' : '💰 Save Payment' }}
       </button>
-      <a  (click)="goBack()"class="btn btn-outline-secondary ms-2 px-4">
+      <a (click)="goBack()" class="btn btn-outline-secondary ms-2 px-4">
         Cancel
       </a>
     </div>
@@ -164,25 +119,13 @@
 </div>
 
 <!-- 🔹 Toast Notification -->
-<div
-  class="toast-container position-fixed bottom-0 end-0 p-3"
-  style="z-index: 1200;"
->
-  <div
-    id="toastMessage"
-    class="toast align-items-center text-white bg-dark border-0"
-    role="alert"
-    aria-live="assertive"
-    aria-atomic="true"
-  >
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1200;">
+  <div id="toastMessage" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive"
+    aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body">Message</div>
-      <button
-        type="button"
-        class="btn-close btn-close-white me-2 m-auto"
-        data-bs-dismiss="toast"
-        aria-label="Close"
-      ></button>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+        aria-label="Close"></button>
     </div>
   </div>
 </div>

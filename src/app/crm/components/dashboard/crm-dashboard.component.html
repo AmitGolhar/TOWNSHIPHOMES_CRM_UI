@@ -20,8 +20,8 @@
   </div>
 
   <!-- CRM Totals -->
-  <div class="row g-3 mb-4" >
-    <div class="col-lg-3 col-md-4 col-sm-6" *ngFor="let s of stats" >
+  <div class="row g-3 mb-4">
+    <div class="col-lg-3 col-md-4 col-sm-6" *ngFor="let s of stats">
       <div class="card stat-card h-100" [style.borderTopColor]="s.color" (click)="navigate(s.route)">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">{{ s.icon }}</div>
@@ -39,15 +39,16 @@
 
     <!-- Follow Ups -->
     <div class="col-lg-3 col-md-4 col-sm-6">
-      <div class="card stat-card h-100" style="border-top-color:#0d6efd;">
+      <div class="card stat-card h-100" style="border-top-color:#0d6efd;" routerLink="/crm/finance/followups">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">📅</div>
           <div>
             <small class="text-muted">Follow-Ups</small>
             <div class="h5 mb-0">
-              {{ financeStats.pendingFollowups }} 🔔 /
-              {{ financeStats.completedFollowups }} ✅
+              {{ followupStats.pending }} 🔔 /
+              {{ followupStats.completed }} ✅
             </div>
+
           </div>
         </div>
       </div>
@@ -55,7 +56,7 @@
 
     <!-- Attendance -->
     <div class="col-lg-3 col-md-4 col-sm-6">
-      <div class="card stat-card h-100" style="border-top-color:#20c997;">
+      <div class="card stat-card h-100" style="border-top-color:#20c997;" routerLink="/crm/finance/attendance">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">🧑‍🤝‍🧑</div>
           <div>
@@ -68,7 +69,7 @@
 
     <!-- Expenses -->
     <div class="col-lg-3 col-md-4 col-sm-6" *ngIf="isAdmin()">
-      <div class="card stat-card h-100" style="border-top-color:#dc3545;">
+      <div class="card stat-card h-100" style="border-top-color:#dc3545;" routerLink="/crm/finance/expenses">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">🧾</div>
           <div>
@@ -82,7 +83,7 @@
 
     <!-- Monthly Revenue -->
     <div class="col-lg-3 col-md-4 col-sm-6" *ngIf="isAdmin()">
-      <div class="card stat-card h-100" style="border-top-color:#28a745;">
+      <div class="card stat-card h-100" style="border-top-color:#28a745;" routerLink="/crm/finance/revenue">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">💼</div>
           <div>
@@ -104,7 +105,7 @@
 
     <!-- Collection Target -->
     <div class="col-lg-4 col-md-4 col-sm-6" *ngIf="isAdmin()">
-      <div class="card stat-card h-100" style="border-top-color:#0d6efd;">
+      <div class="card stat-card h-100" style="border-top-color:#0d6efd;" routerLink="/crm/payments">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">💰</div>
           <div>
@@ -133,7 +134,7 @@
     </div>
 
     <!-- Incentives -->
-    <div class="col-lg-4 col-md-4 col-sm-6" *ngIf="isAdmin()">
+    <div class="col-lg-4 col-md-4 col-sm-6" *ngIf="isAdmin()" routerLink="/crm/finance/incentives">
       <div class="card stat-card h-100" style="border-top-color:#ffc107;">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">🏆</div>
@@ -156,7 +157,7 @@
 
     <!-- Total Payment Amount -->
     <div class="col-lg-4 col-md-4 col-sm-6" *ngIf="isAdmin()">
-      <div class="card stat-card h-100" style="border-top-color:#0d6efd;">
+      <div class="card stat-card h-100" style="border-top-color:#0d6efd;" routerLink="/crm/payments">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">💵</div>
           <div>
@@ -171,7 +172,7 @@
 
     <!-- Total Paid Amount -->
     <div class="col-lg-4 col-md-4 col-sm-6" *ngIf="isAdmin()">
-      <div class="card stat-card h-100" style="border-top-color:#28a745;">
+      <div class="card stat-card h-100" style="border-top-color:#28a745;" routerLink="/crm/payments">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">💚</div>
           <div>
@@ -185,7 +186,7 @@
     </div>
 
     <!-- Total Pending Amount -->
-    <div class="col-lg-4 col-md-4 col-sm-6" *ngIf="isAdmin()">
+    <div class="col-lg-4 col-md-4 col-sm-6" *ngIf="isAdmin()" routerLink="/crm/payments">
       <div class="card stat-card h-100" style="border-top-color:#dc3545;">
         <div class="card-body d-flex align-items-center">
           <div class="me-3 fs-1">🔔</div>
@@ -219,47 +220,55 @@
     <!-- Collection Chart -->
     <div class="col-lg-6" *ngIf="isAdmin()">
       <div class="card p-3">
-        <h6>📊 Collection Progress vs Target</h6>
-        <canvas id="collectionChart" class="dashboard-chart"></canvas>
+        <h6>⏰ Overdue Tasks By Module</h6>
+        <canvas id="OverdueTasksChart" class="dashboard-chart"></canvas>
       </div>
     </div>
 
 
+    <div class="row g-3">
 
-    <!-- Pending vs Collected Payments -->
-    <div class="col-lg-3 col-md-6" *ngIf="isAdmin()">
-      <div class="card p-3">
-        <h6>🔔 Pending vs Collected Payments</h6>
+      <!-- ✅ 40% : Pending vs Collected Payments -->
+      <div class="col-lg-3 col-md-12" *ngIf="isAdmin()">
+        <div class="card p-3 h-100">
+          <h6>🔔 Pending vs Collected Payments</h6>
 
-        <div class="d-flex justify-content-between px-2 mb-2">
-          <div>
-            <small class="text-muted">Collected</small>
-            <div class="fw-bold text-success">₹{{ financeStats.totalPaidAmount | number }}</div>
+          <div class="d-flex justify-content-between px-2 mb-2">
+            <div>
+              <small class="text-muted">Collected</small>
+              <div class="fw-bold text-success">
+                ₹{{ financeStats.totalPaidAmount | number }}
+              </div>
+            </div>
+            <div class="text-end">
+              <small class="text-muted">Pending</small>
+              <div class="fw-bold text-danger">
+                ₹{{ financeStats.pendingPayments | number }}
+              </div>
+            </div>
           </div>
-          <div class="text-end">
-            <small class="text-muted">Pending</small>
-            <div class="fw-bold text-danger">₹{{ financeStats.pendingPayments | number }}</div>
-          </div>
+
+          <canvas id="paymentsChart" class="dashboard-chart" style="height:220px;"></canvas>
         </div>
-
-        <canvas id="paymentsChart" class="dashboard-chart" style="height:220px;"></canvas>
       </div>
+
+
+      <!-- ✅ 60% : Employee Performance -->
+      <div class="col-lg-9 col-md-12">
+        <div class="card p-3 h-100">
+          <h6>🧩 Employee Performance</h6>
+          <canvas id="employeeChart" class="dashboard-chart" style="height:260px;"></canvas>
+        </div>
+      </div>
+
     </div>
 
 
-
-    <!-- Employee Performance -->
-    <div class="col-lg-6">
-      <div class="card p-3">
-        <h6>🧩 Employee Performance</h6>
-        <canvas id="employeeChart" class="dashboard-chart"></canvas>
-      </div>
-    </div>
 
     <!-- Expenses -->
     <div class="col-lg-6" *ngIf="isAdmin()">
       <div class="card p-3">
-        <h6>🧾 Expenses Trend</h6>
+        <h6>🧾 Expenses vs Incentive</h6>
         <canvas id="expenseChart"></canvas>
       </div>
     </div>
@@ -267,7 +276,7 @@
     <!-- Revenue -->
     <div class="col-lg-6" *ngIf="isAdmin()">
       <div class="card p-3">
-        <h6>💹 Revenue vs Target</h6>
+        <h6>💹 Actual Revenue vs Target</h6>
         <canvas id="revenueChart"></canvas>
       </div>
     </div>
@@ -290,7 +299,12 @@
               <div class="d-flex justify-content-between align-items-start">
                 <div>
                   <div class="fw-semibold">{{ t.title }}</div>
-                  <small class="text-muted">{{ t.module }} • {{ t.assignedTo }}</small>
+                  <small class="text-muted">
+                    {{ t.module }} • {{ getEmployeeName(t.assignedTo) }}
+                  </small>
+
+
+
                 </div>
                 <div class="text-end">
                   <div><small>{{ t.dueDate | date:'shortDate' }}</small></div>
@@ -318,7 +332,12 @@
               <div class="d-flex justify-content-between align-items-start">
                 <div>
                   <div class="fw-semibold text-danger">{{ t.title }}</div>
-                  <small class="text-muted">{{ t.module }} • {{ t.assignedTo }}</small>
+                  <small class="text-muted">
+                    {{ t.module }} • {{ getEmployeeName(t.assignedTo) }}
+                  </small>
+
+
+
                 </div>
                 <div class="text-end">
                   <div><small>{{ t.dueDate | date:'shortDate' }}</small></div>

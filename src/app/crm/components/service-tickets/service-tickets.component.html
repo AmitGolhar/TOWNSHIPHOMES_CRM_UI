@@ -1,0 +1,197 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="text-primary">🎫 Service Tickets</h4>
+</div>
+
+<!-- Loader -->
+<div *ngIf="isLoading" class="text-center my-4">
+  <div class="spinner-border text-primary"></div>
+  <p class="text-muted">Loading service tickets...</p>
+</div>
+
+<!-- Error -->
+<div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+<!-- Search -->
+<div class="mb-3" *ngIf="!isLoading">
+  <input type="text" class="form-control" placeholder="Search tickets..."
+         [(ngModel)]="searchText" />
+</div>
+
+<!-- Table -->
+<table class="table table-hover align-middle" *ngIf="!isLoading">
+  <thead class="table-primary">
+    <tr>
+      <th>#</th>
+      <th>Service</th>
+      <th>Customer</th>
+      <th>Phone</th>
+      <th>Date</th>
+      <th>Assigned To</th>
+      <th>Status</th>
+      <th>Due Date</th>
+      <th class="text-center">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let ticket of filteredTickets(); let i = index"
+        class="animate__animated animate__fadeIn" (click)="openEditModal(ticket)">
+
+      <td>{{ i + 1 }}</td>
+      <td>{{ ticket.serviceName }}</td>
+      <td>{{ ticket.customerName }}</td>
+      <td>{{ ticket.phone }}</td>
+      <td>{{ ticket.preferredDate }}</td>
+
+      <td>{{ employeeMap[ticket.assignedTo] || '-' }}</td>
+
+      <td>
+        <span class="badge"
+              [ngClass]="{
+                'bg-warning text-dark': ticket.status === 'Pending',
+                'bg-info text-dark': ticket.status === 'In Progress',
+                'bg-success': ticket.status === 'Completed',
+                'bg-secondary text-white': ticket.status == 'On Hold', 
+                 'bg-danger text-white': ticket.status == 'Cancelled'
+              }">
+          {{ ticket.status }}
+        </span>
+      </td>
+
+      <td>{{ ticket.dueDate }}</td>
+
+      <td class="text-center">
+        <button class="btn btn-sm btn-outline-primary me-1" (click)="openEditModal(ticket)">
+          ✏️
+        </button>
+        <button class="btn btn-sm btn-outline-danger" (click)="deleteTicket(ticket.id)">
+          🗑️
+        </button>
+      </td>
+
+    </tr>
+
+    <tr *ngIf="filteredTickets().length === 0">
+      <td colspan="9" class="text-center text-muted py-3">
+        No service tickets found.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- 🧩 Service Ticket Modal -->
+<div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="ticketModalLabel">
+          {{ isEditing ? '✏️ Edit Service Ticket' : '➕ Add Service Ticket' }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <form>
+
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Service Name</label>
+              <input type="text" class="form-control" [(ngModel)]="selectedTicket.serviceName" name="serviceName">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Customer Name</label>
+              <input type="text" class="form-control" [(ngModel)]="selectedTicket.customerName" name="customerName">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Phone</label>
+              <input type="text" class="form-control" [(ngModel)]="selectedTicket.phone" name="phone">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" class="form-control" [(ngModel)]="selectedTicket.email" name="email">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Preferred Date</label>
+              <input type="date" class="form-control" [(ngModel)]="selectedTicket.preferredDate" name="preferredDate">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Due Date</label>
+              <input type="date" class="form-control" [(ngModel)]="selectedTicket.dueDate" name="dueDate">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Assigned To</label>
+              <select class="form-select" [(ngModel)]="selectedTicket.assignedTo" name="assignedTo">
+                <option value="">Select employee...</option>
+                <option *ngFor="let emp of employees" [value]="emp.id">{{ emp.name }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Status</label>
+              <select class="form-select" [(ngModel)]="selectedTicket.status" name="status">
+                <option *ngFor="let s of statuses">{{ s }}</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Issue Details</label>
+              <textarea class="form-control" rows="3"
+                        [(ngModel)]="selectedTicket.issueDetails"
+                        name="issueDetails"></textarea>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Society</label>
+              <input type="text" class="form-control" [(ngModel)]="selectedTicket.society" name="society">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Wing</label>
+              <input type="text" class="form-control" [(ngModel)]="selectedTicket.wing" name="wing">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Flat No</label>
+              <input type="text" class="form-control" [(ngModel)]="selectedTicket.flatNo" name="flatNo">
+            </div>
+          <!-- 🔥 Show Existing Photos -->
+          <div class="col-12 mt-3" *ngIf="selectedTicket.photos?.length">
+            <label class="form-label fw-semibold">Existing Photos</label>
+            <div class="d-flex flex-wrap gap-3">
+              <img *ngFor="let p of selectedTicket.photos"
+                  [src]="'data:image/jpeg;base64,' + p"
+                  style="width: 120px; height: 120px; object-fit: cover; 
+                          border-radius: 6px; border: 1px solid #ccc;">
+            </div>
+          </div>
+
+          <!-- 🆕 Upload New Photos (optional) -->
+          <div class="col-12 mt-3">
+            <label class="form-label fw-semibold">Upload New Photos Once work done</label>
+            <input type="file" class="form-control" multiple (change)="onPhotoSelect($event)">
+          </div>
+
+            
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" (click)="saveTicket()" [disabled]="isSaving">
+          <span *ngIf="!isSaving">{{ isEditing ? 'Update' : 'Save' }}</span>
+          <span *ngIf="isSaving"><span class="spinner-border spinner-border-sm me-2"></span>Processing...</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

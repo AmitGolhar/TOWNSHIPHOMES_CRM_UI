@@ -25,6 +25,7 @@ import { EmployeeListComponent } from './components/employee-list/employee-list.
 import { EmployeeFilterPipe } from '@app/pipes/employee-filter.pipe';
 import { HousingWhatsAppComponent } from './components/housing-whatsapp/housing-whatsapp.component';
 import { Acres99WhatsAppComponent } from './components/acres99-whatsapp/acres99-whatsapp.component';
+import { ServiceTicketsComponent } from './components/service-tickets/service-tickets.component';
    
 
 @NgModule({
@@ -46,7 +47,8 @@ import { Acres99WhatsAppComponent } from './components/acres99-whatsapp/acres99-
     EmployeeListComponent,
      EmployeeFilterPipe,
      HousingWhatsAppComponent,
-     Acres99WhatsAppComponent
+     Acres99WhatsAppComponent,
+     ServiceTicketsComponent
     
   ],
   imports: [

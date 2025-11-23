@@ -23,7 +23,7 @@
     <div class="col-md-8">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body">
-          <h6 class="fw-semibold mb-3 text-secondary">Monthly Collection vs Target</h6>
+          <h6 class="fw-semibold mb-3 text-secondary">Monthly Collection vs Pending</h6>
           <div style="height:300px;">
             <canvas id="revBar"></canvas>
           </div>
@@ -43,4 +43,49 @@
       </div>
     </div>
   </div>
+
+  <div class="card shadow-sm mt-4">
+    <div class="card-body">
+      <h6 class="fw-semibold mb-3 text-secondary">👨‍💼 Employee Collection Summary</h6>
+
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Employee</th>
+            <th>Collected</th>
+            <th>Pending</th>
+            <th>Target</th>
+            <th>Achievement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of employeeStats">
+            <td>{{ e.employee }}</td>
+
+            <!-- Collected -->
+            <td>₹{{ e.collected || 0 | number }}</td>
+
+            <!-- Pending -->
+            <td>₹{{ e.pending || 0 | number }}</td>
+
+            <!-- Target (collected + pending) -->
+            <td>₹{{ e.target || 0 | number }}</td>
+
+            <!-- Percentage badge -->
+            <td>
+              <span class="badge" [ngClass]="{
+          'bg-success': e.percentage >= 100,
+          'bg-warning text-dark': e.percentage < 100 && e.percentage >= 50,
+          'bg-danger': e.percentage < 50
+        }">
+                {{ e.percentage || 0 | number:'1.0-0' }}%
+              </span>
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+
 </div>

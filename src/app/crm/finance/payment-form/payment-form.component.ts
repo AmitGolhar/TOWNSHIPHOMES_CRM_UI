@@ -4,6 +4,8 @@ import { PaymentService } from '../payment.service';
 import { Payment } from '../modal/payment.model';
 import { finalize } from 'rxjs/operators';
 import { UiToastService } from '@app/services/ui-toast.service';
+import { EmployeeService } from '@app/services/employee.service';
+import { AuthService } from '@app/services/auth.service';
  
 @Component({
   selector: 'app-payment-form',
@@ -12,33 +14,69 @@ import { UiToastService } from '@app/services/ui-toast.service';
 })
 export class PaymentFormComponent implements OnInit {
   payment: Payment = {
-    clientName: '',
-    propertyName: '',
-    totalAmount: 0,
-    paidAmount: 0,
-    pendingAmount: 0,
-    status: 'Pending',
-    paymentMode: 'Cash'
-  };
+  clientName: '',
+  propertyName: '',
+  totalAmount: 0,
+  paidAmount: 0,
+  pendingAmount: 0,
+  collectionTarget: 0,
+  status: 'Pending',
+  paymentMode: 'Cash',
+  assignedTo: '',
+  assignedEmployeeName: ''
+};
+
 
   isEditMode = false;
   loading = false;
   error = '';
+employees: any[] = [];
+employeeMap: { [key: string]: string } = {};
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private svc: PaymentService,
-    private toast: UiToastService    // ✅ GLOBAL TOAST
+    private toast: UiToastService   ,  
+     private employeeService: EmployeeService,       
+  private authService: AuthService               
   ) {}
 
   ngOnInit(): void {
+      this.loadEmployees();
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.isEditMode = true;
       this.loadPayment(+idParam);
     }
   }
+
+loadEmployees(): void {
+  this.employeeService.getAllEmployees().subscribe({
+    next: (data) => {
+      this.employees = data || [];
+
+      this.employeeMap = {};
+      this.employees.forEach(emp => {
+        this.employeeMap[emp.email] = emp.name;
+      });
+
+      // ✅ username = email stored in session
+      const email = this.authService.getUsername();
+            const fullName = this.authService.getFullName();
+
+      if (email) {
+        this.payment.assignedTo = email; // store EMAIL directly ✅
+        this.payment.assignedEmployeeName = fullName || 'Unknown';
+          
+      }
+    },
+    error: err => console.error('❌ Failed to load employees:', err),
+  });
+}
+
+
 
   loadPayment(id: number): void {
     this.loading = true;

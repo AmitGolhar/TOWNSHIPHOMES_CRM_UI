@@ -1,4 +1,6 @@
-/* ===== CRM Wrapper ===== */
+/* ============================
+   CRM WRAPPER
+============================ */
 .crm-wrapper {
   display: flex;
   flex-direction: row;
@@ -8,7 +10,9 @@
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* ===== Sidebar ===== */
+/* ============================
+   SIDEBAR BASE
+============================ */
 .crm-sidebar {
   width: 240px;
   height: 100vh;
@@ -17,19 +21,21 @@
   position: fixed;
   top: 0;
   left: 0;
-  transform: translateX(0);
-  transition: transform 0.35s ease-in-out, background 0.35s;
   z-index: 1050;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  transition: width 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
 }
 
+/* HEADER */
 .sidebar-header {
   padding: 0.8rem 1rem;
   border-bottom: 1px solid var(--border-color);
   background: color-mix(in srgb, var(--accent-color) 5%, var(--card-bg));
 }
 
-/* ===== Sidebar Nav ===== */
+/* ============================
+   NAVIGATION
+============================ */
 .nav-scroll {
   padding: 0.5rem 1rem 1rem;
   max-height: calc(100vh - 60px);
@@ -60,48 +66,81 @@
   box-shadow: 0 3px 10px color-mix(in srgb, var(--accent-color) 40%, transparent);
 }
 
-/* ===== Main Content ===== */
+/* ============================
+   CONTENT AREA
+============================ */
 .crm-content {
   flex: 1;
   margin-left: 240px;
-  background: var(--bg-color);
   padding: 1rem;
-  transition: margin-left 0.35s ease, background-color 0.3s;
+  background: var(--bg-color);
+  transition: margin-left 0.3s ease;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-@media (max-width: 991.98px) {
+/* ============================
+   DESKTOP COLLAPSE MODE
+============================ */
+.crm-sidebar.collapsed {
+  width: 60px !important;
+}
+
+/* Hide text when collapsed */
+.crm-sidebar.collapsed h6,
+.crm-sidebar.collapsed .text-label {
+  display: none !important;
+}
+
+/* Force icons to stay LEFT aligned when menu is OPEN */
+.crm-sidebar:not(.collapsed) .nav-link {
+  justify-content: flex-start !important;
+}
+
+/* When collapsed → icons centered */
+.crm-sidebar.collapsed .nav-link {
+  justify-content: center !important;
+}
+
+
+/* Content shift when collapsed */
+.crm-content.collapsed {
+  margin-left: 60px !important;
+}
+
+/* ============================
+   MOBILE SLIDE MENU
+============================ */
+@media (max-width: 991px) {
   .crm-sidebar {
     transform: translateX(-100%);
+    width: 240px !important; /* full size on mobile */
   }
 
   .crm-sidebar.open {
     transform: translateX(0);
   }
 
-  .crm-content {
-    margin-left: 0;
+  /* collapse ignored on mobile */
+  .crm-sidebar.collapsed {
+    width: 240px !important;
+  }
+
+  .crm-content,
+  .crm-content.collapsed {
+    margin-left: 0 !important;
   }
 }
 
-/* ===== Overlay ===== */
-.crm-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(3px);
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* ===== Compact Toggle Button ===== */
+/* ============================
+   TOGGLE BUTTON
+============================ */
 .crm-toggle-btn {
   position: fixed;
-    top: 30px;
-    left: 26px;
+  top: 30px;
+  left: 26px;
   background: var(--accent-color);
   color: #fff;
   border: none;
@@ -118,30 +157,179 @@
   background: color-mix(in srgb, var(--accent-color) 85%, black);
 }
 
-/* ===== Main Content ===== */
+/* ============================
+   OVERLAY
+============================ */
+.crm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1;}
+}
+
+/* ============================
+   BADGES
+============================ */
+.badge.ng-star-inserted {
+  text-transform: capitalize;
+}
+
+.badge {
+  display: inline-block;
+}
+
+.badge.on-hold {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+/* Hide labels when collapsed */
+.crm-sidebar.collapsed .text-label {
+  display: none;
+}
+
+/* Show labels on hover even when collapsed */
+/* When collapsed AND hovered → show full menu left aligned */
+.crm-sidebar.collapsed:hover .nav-link {
+  justify-content: flex-start !important;
+}
+
+/* Expand width correctly on hover */
+.crm-sidebar.collapsed:hover {
+  width: 240px !important;
+}
+
+
+.crm-sidebar.collapsed:hover .text-label {
+  display: inline-block !important;
+  opacity: 1;
+}
+
+/* Animate smooth expansion */
+.crm-sidebar {
+  transition: width 0.25s ease-in-out;
+}
+
+.crm-sidebar .text-label {
+  transition: opacity 0.2s ease-in-out;
+}
+/* TOP HEADER (fixed at top) */
+.sidebar-top-toggle {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 48px;
+  width: 240px;
+  padding: 10px 15px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  z-index: 2000;
+  transition: width 0.3s ease;
+}
+
+/* When collapsed → shrink to icon-only */
+.crm-sidebar.collapsed + .sidebar-header,
+.sidebar-header.collapsed,
+.sidebar-top-toggle.collapsed {
+  width: 60px !important;
+  text-align: center;
+}
+
+/* SIDEBAR BASE */
+.crm-sidebar {
+  width: 240px;
+  transition: width 0.3s ease;
+}
+
+.crm-sidebar.collapsed {
+  width: 60px !important;
+}
+
+/* Collapse inner header */
+.sidebar-header {
+  width: 240px;
+  height: 50px;
+  padding: 10px 15px;
+  transition: width 0.3s ease, padding 0.2s ease;
+}
+
+ /* Freeze body scrolling */
+body {
+  overflow: hidden !important;
+}
+
+/* Wrapper MUST take full height */
+.crm-wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* Stops outer scrolling */
+}
+
+/* Sidebar fixed (no scrolling at all) */
+.crm-sidebar {
+  height: 100vh;
+  overflow: hidden !important;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+/* Main scrolls vertically, but NOT horizontally */
 .crm-content {
-  flex: 1;
   margin-left: 240px;
-  background: var(--bg-color);
   padding: 1rem;
-  transition: margin-left 0.35s ease, background-color 0.3s;
-  
-  /* 💡 Fix Horizontal Scroll */
-  overflow-x: hidden;   /* Prevents horizontal scrolling */
-  overflow-y: auto;     /* Allows vertical scrolling */
-  width: 100%;          /* Prevents layout stretching */
+  width: calc(100% - 240px);
+
+  overflow-y: auto !important;   /* MAIN SCROLL */
+  overflow-x: hidden !important; /* Prevent sideways scroll */
+
+  height: 100vh;                 /* Makes it scrollable */
   box-sizing: border-box;
 }
 
-@media (max-width: 991.98px) {
-  .crm-content {
-    margin-left: 0;
-    width: 100%;
+/* Collapsed mode */
+.crm-content.collapsed {
+  margin-left: 60px !important;
+  width: calc(100% - 60px);
+}
+
+/* Mobile mode */
+@media (max-width: 991px) {
+  .crm-content,
+  .crm-content.collapsed {
+    margin-left: 0 !important;
+    width: 100% !important;
   }
 }
+/* Top toggle base */
+.sidebar-top-toggle {
+  width: 240px;
+  height: 50px;
+  padding: 10px 15px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: width 0.3s ease, padding 0.3s ease;
+}
 
-/* Optional: ensure inner components don’t overflow container */
-.crm-content * {
-  max-width: 100%;
-  box-sizing: border-box;
+/* COLLAPSED (match sidebar) */
+.sidebar-top-toggle.collapsed {
+  width: 60px !important;
+  padding: 10px 5px !important;
+  text-align: center;
+}
+
+/* Hover → expand same as sidebar */
+.crm-sidebar.collapsed:hover + .sidebar-top-toggle,
+.sidebar-top-toggle.collapsed:hover {
+  width: 240px !important;
+  padding-left: 15px !important;
+  padding-right: 15px !important;
 }

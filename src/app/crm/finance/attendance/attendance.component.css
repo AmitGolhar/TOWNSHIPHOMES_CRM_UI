@@ -81,3 +81,18 @@
 [data-theme="dark"] .badge-success {
   background: linear-gradient(135deg, #16a34a, color-mix(in srgb, var(--accent-color) 15%, #22c55e));
 }
+/* Light theme */
+body.light-theme .attendance-box {
+  background: #f8f9fa;
+  color: #212529;
+}
+
+/* Dark theme */
+body.dark-theme .attendance-box {
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark-theme .attendance-box strong {
+  color: #ffffff;
+}

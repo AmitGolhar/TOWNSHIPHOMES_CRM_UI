@@ -35,6 +35,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   employees: Employee[] = [];
   selectedEmployeeEmail: string | null = null;
   isDragSaving = false;
+originalStatus: string | null = null;
 
   /** Kanban Columns */
   columns = [
@@ -54,6 +55,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   dragModalNewStatus = '';
   dragModalNote = '';
   isSaving = false;
+  savingTask = false;
 
   // Full list of task titles (keep your full list)
   taskTitleOptions: string[] = [
@@ -338,7 +340,7 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dragModalTask = null;
         this.dragModalNote = '';
         this.isDragSaving = false;
-
+        this.refreshColumns()
         this.loadTasks();
       },
       error: (err) => {
@@ -388,6 +390,8 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   edit(task: TodoTask): void {
     this.editing = { ...task };
+      this.originalStatus = task.status; // store previous status
+
     // refresh email display
     this.updateAssignedEmailView();
   }
@@ -399,36 +403,46 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   // ---------------------------------------------------
   // Save (create or update) — send cleaned payload
   // ---------------------------------------------------
-  save(task: TodoTask): void {
-    if (this.isSaving) return; // avoid duplicate clicks
-    this.isSaving = true;
+ save(task: TodoTask): void {
+  if (this.isSaving) return;
 
-    // Track old status if changed
-    if (task.id) {
-      const original = this.tasks.find((t) => t.id === task.id);
-      if (original && original.status !== task.status) {
-        (task as any).lastStatus = original.status;
-      }
-    }
+  const statusChanged = task.id && this.originalStatus !== task.status;
 
-    this.applyAssignedEmail(task);
-    const cleaned = this.stripUiFields(task);
-
-    const req = cleaned.id ? this.svc.update(cleaned) : this.svc.add(cleaned);
-
-    req.subscribe({
-      next: () => {
-        this.toast.showSuccess('Task saved successfully ✔');
-        this.editing = null;
-        this.isSaving = false;
-      },
-      error: (err) => {
-        this.toast.showError('Failed to save task ❌');
-        this.isSaving = false;
-        console.error(err);
-      },
-    });
+  // ✅ Force notes if status changed
+  if (statusChanged && (!task.notes || task.notes.trim() === '')) {
+    this.toast.showError('Please add a note before changing status ❗');
+    return;
   }
+
+  this.isSaving = true;
+
+  // Attach last status for backend
+  if (statusChanged) {
+    (task as any).lastStatus = this.originalStatus;
+  }
+
+  this.applyAssignedEmail(task);
+  const cleaned = this.stripUiFields(task);
+
+  const req = cleaned.id ? this.svc.update(cleaned) : this.svc.add(cleaned);
+
+  req.subscribe({
+    next: () => {
+      this.toast.showSuccess('Task saved successfully ✔');
+      this.editing = null;
+      this.isSaving = false;
+      this.refreshColumns();
+      this.loadTasks();
+    },
+    error: err => {
+      this.toast.showError('Failed to save task ❌');
+      this.isSaving = false;
+      console.error(err);
+    }
+  });
+}
+
+
 
   // ---------------------------------------------------
   // Ensure assignedEmail is set from employees list (employee id → email)
@@ -491,7 +505,13 @@ export class TodoListComponent implements OnInit, AfterViewInit, OnDestroy {
   delete(t: TodoTask): void {
     if (t.id && confirm(`Delete task "${t.title}"?`)) {
       this.svc.delete(t.id).subscribe({
-        next: () => console.log('🗑️ Deleted'),
+        
+        next: () => {console.log('🗑️ Deleted')
+            
+        this.loadTasks();
+         this.toast.showSuccess('Deleted Successfully ✔');
+        }, 
+        
         error: (err) => console.error('❌ Delete failed:', err),
       });
     }

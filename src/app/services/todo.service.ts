@@ -6,7 +6,7 @@ import { TodoTask } from '@app/models/todo-task.model';
 
 @Injectable({ providedIn: 'root' })
 export class TodoService {
-  private baseUrl = `${environment.apiUrl}/todo-task-board`;
+  private baseUrl = `${environment.apiUrl}/todo-task-board/all-tasks`;
   private tasks$ = new BehaviorSubject<TodoTask[]>([]);
 
   constructor(private http: HttpClient, private zone: NgZone) {

@@ -566,3 +566,37 @@ label, .form-label {
   border-color: var(--accent-color) !important;
   box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--accent-color) 25%, transparent) !important;
 }
+ 
+
+ 
+/* ==============================
+   MOBILE ONLY TABLE SCROLL
+   Applies only below 768px
+==============================*/
+@media (max-width: 767px) {
+
+  table {
+    display: block !important;     /* enables scrolling */
+    overflow-x: auto !important;   /* horizontal scroll */
+    white-space: nowrap !important;/* prevent breaking */
+    width: 100% !important;
+  }
+
+  table thead,
+  table tbody,
+  table tr {
+    display: table !important;     /* restore table structure */
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+
+  /* Optional nicer scrollbars */
+  table::-webkit-scrollbar {
+    height: 6px;
+  }
+  table::-webkit-scrollbar-thumb {
+    background: #b5b5b5;
+    border-radius: 4px;
+  }
+}
+

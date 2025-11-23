@@ -34,6 +34,8 @@
       <th>Collected</th>
       <th>Pending</th>
       <th>Status</th>
+      <th>Assigned To</th>
+
       <th>Next Due</th>
       <th>Actions</th>
     </tr>
@@ -57,10 +59,20 @@
                 'bg-warning text-dark': p.status === 'Pending',
                 'bg-info text-dark': p.status === 'Partial',
                 'bg-success': p.status === 'Paid'
+                
               }">
           {{ p.status }}
         </span>
       </td>
+      <td>
+        <div class="fw-semibold">
+          {{ p.assignedEmployeeName || '—' }}
+        </div>
+        <small class="text-muted" *ngIf="p.assignedTo">
+          {{ p.assignedTo }}
+        </small>
+      </td>
+
       <td>{{ p.nextDueDate || '—' }}</td>
       <td>
         <button class="btn btn-sm btn-outline-primary me-1" (click)="edit(p)">✏️</button>

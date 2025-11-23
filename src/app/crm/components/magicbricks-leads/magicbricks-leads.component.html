@@ -69,7 +69,9 @@
               [ngClass]="{
                 'bg-success': lead.followupCurrentStatus === 'Completed',
                 'bg-warning text-dark': lead.followupCurrentStatus === 'New',
-                'bg-info text-dark': lead.followupCurrentStatus === 'In Progress'
+                'bg-info text-dark': lead.followupCurrentStatus === 'In Progress',
+                  'bg-secondary text-white': lead.status == 'On Hold', 
+                 'bg-danger text-white': lead.status == 'Cancelled'
               }"
             >
               {{ lead.followupCurrentStatus }}

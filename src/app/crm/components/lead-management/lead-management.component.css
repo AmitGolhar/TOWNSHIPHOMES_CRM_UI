@@ -104,3 +104,14 @@ textarea::placeholder {
 }
 
 
+/* Works everywhere when Angular renders On Hold */
+.badge.ng-star-inserted {
+  text-transform: capitalize;
+}
+
+/* The magic trick — match exact text */
+.badge {
+  display: inline-block;
+}
+
+ 

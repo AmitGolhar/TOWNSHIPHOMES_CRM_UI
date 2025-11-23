@@ -44,7 +44,9 @@
             [ngClass]="{
               'bg-warning text-dark': it.status === 'Pending',
               'bg-info text-dark': it.status === 'Approved',
-              'bg-success': it.status === 'Paid'
+              'bg-success': it.status === 'Paid',
+                'bg-secondary text-white': it.status == 'On Hold', 
+                 'bg-danger text-white': it.status == 'Cancelled'
             }">
             {{ it.status }}
           </span>

@@ -50,4 +50,9 @@ export class PaymentService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  getEmployeeRevenue() {
+  return this.http.get<any[]>(`${this.baseUrl}/employee-revenue`);
+}
+
 }

@@ -1,0 +1,26 @@
+/* Table Hover */
+.table-hover tbody tr {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.table-hover tbody tr:hover {
+  background-color: color-mix(in srgb, var(--accent-color) 10%, var(--card-bg));
+  cursor: pointer;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .table-hover tbody tr:hover {
+  background-color: color-mix(in srgb, var(--accent-color) 15%, var(--card-bg));
+}
+/* Works everywhere when Angular renders On Hold */
+.badge.ng-star-inserted {
+  text-transform: capitalize;
+}
+
+ 
