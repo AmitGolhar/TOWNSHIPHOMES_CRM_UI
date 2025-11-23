@@ -76,6 +76,7 @@ export class FinanceService {
 }
 
 
+
   /** ====================== ✅ Attendance ====================== */
   getAttendance(): Observable<AttendanceRecord[]> {
     return this.attendance$.asObservable();

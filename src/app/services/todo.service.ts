@@ -4,9 +4,14 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '@app/environment/environment';
 import { TodoTask } from '@app/models/todo-task.model';
 
+interface AutoFollowupResponse {
+  count: number;
+  message: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TodoService {
-  private baseUrl = `${environment.apiUrl}/todo-task-board/all-tasks`;
+  private baseUrl = `${environment.apiUrl}/todo-task-board`;
   private tasks$ = new BehaviorSubject<TodoTask[]>([]);
 
   constructor(private http: HttpClient, private zone: NgZone) {
@@ -15,16 +20,17 @@ export class TodoService {
   }
 
   /** ✅ Load initial data */
-  private loadAll(): void {
-    this.http.get<TodoTask[]>(this.baseUrl).subscribe({
-      next: (data) => this.tasks$.next(data),
-      error: (err) => console.error('Failed to load tasks:', err)
-    });
-  }
+private loadAll(): void {
+  this.http.get<TodoTask[]>(`${this.baseUrl}/all-tasks`).subscribe({
+    next: (data) => this.tasks$.next(data),
+    error: (err) => console.error('Failed to load tasks:', err),
+  });
+}
+
 
   /** ✅ SSE real-time stream */
   private initSSE(): void {
-    const eventSource = new EventSource(`${this.baseUrl}/stream`);
+    const eventSource = new EventSource(`${this.baseUrl}/all-tasks/stream`);
     eventSource.onmessage = (event) => {
       this.zone.run(() => {
         try {
@@ -64,7 +70,7 @@ export class TodoService {
       notes: task.notes || '',
       attachments: [],
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     return this.http.post<TodoTask>(this.baseUrl, fullTask);
@@ -76,7 +82,7 @@ export class TodoService {
 
     const updatedTask = {
       ...task,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     return this.http.put<TodoTask>(`${this.baseUrl}/${task.id}`, updatedTask);
@@ -88,7 +94,23 @@ export class TodoService {
   }
 
   /** ✅ Manual load (fallback) */
-  getAll(): Observable<TodoTask[]> {
-    return this.http.get<TodoTask[]>(this.baseUrl);
+getAll(): Observable<TodoTask[]> {
+  return this.http.get<TodoTask[]>(`${this.baseUrl}/all-tasks`);
+}
+
+
+  getAutoFollowupsStatus() {
+    return this.http.get<AutoFollowupResponse>(
+      `${this.baseUrl}/auto-followups`
+    );
   }
+
+  sendFollowup(id: number) {
+  return this.http.post(`${this.baseUrl}/auto-followups/send/${id}`, {});
+}
+
+sendBulkFollowups() {
+  return this.http.post(`${this.baseUrl}/auto-followups/send-all`, {});
+}
+
 }

@@ -37,3 +37,69 @@
 [data-theme='dark'] .card {
   box-shadow: 0 4px 16px color-mix(in srgb, var(--accent-color) 20%, black);
 }
+/* ✅ Mobile horizontal scroll */
+.mobile-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ✅ Keep table readable on small screens */
+@media (max-width: 768px) {
+  table {
+    min-width: 900px;
+  }
+}
+
+/* Hover effect match */
+.table-hover tbody tr:hover {
+  background-color: color-mix(in srgb, var(--accent-color) 10%, var(--card-bg));
+  cursor: pointer;
+}
+
+/* Buttons look */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Badge uniform */
+.badge {
+  font-size: 0.85rem;
+  padding: 6px 10px;
+}
+ /* ===============================
+   EXPORT BUTTON - HARD OVERRIDE
+   =============================== */
+
+/* Light mode */
+:host .btn-dark {
+  background: transparent !important;
+  border: 1.5px solid #bdbdbd !important;
+  color: #000 !important;
+}
+
+/* Light hover */
+:host .btn-dark:hover {
+  background: #f3f3f3 !important;
+  color: #000 !important;
+}
+
+/* 🌙 DARK THEME — FORCE WHITE */
+:host-context([data-theme="dark"]) .btn-dark {
+  background: transparent !important;
+  border: 1.5px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Dark hover */
+:host-context([data-theme="dark"]) .btn-dark:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* ✅ Also force icon color inside button (if any) */
+:host-context([data-theme="dark"]) .btn-dark i,
+:host-context([data-theme="dark"]) .btn-dark svg {
+  color: #ffffff !important;
+}
+

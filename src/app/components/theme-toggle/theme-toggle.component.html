@@ -1,4 +1,6 @@
-<div class="theme-card">
+<div class="theme-card draggable" #themePanel>
+  <div class="drag-handle">⚙️ Theme Settings</div>
+
   <div class="theme-toggle">
     <span>🌞</span>
     <label class="switch">
@@ -10,7 +12,6 @@
 
   <div class="accent-picker">
     <label for="accent">Accent:</label>
-  <input type="color" id="accent" [value]="accent" (input)="changeAccent($event)">
-
+    <input type="color" id="accent" [value]="accent" (input)="changeAccent($event)">
   </div>
 </div>

@@ -1,16 +1,70 @@
-<div class="card p-3">
-  <div class="d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">🧮 Payment Aging Report</h5>
-    <small class="text-muted">Grouped by days to due date</small>
+<div class="card p-4">
+  <h5 class="mb-3 text-primary">🧮 Payment Aging Report</h5>
+
+  <!-- Quick Explanation -->
+  <div class="alert alert-info small">
+    Aging shows how long payments have been overdue.<br>
+    <strong>Green → Recent | Red → Critical</strong>
   </div>
 
-  <div class="row mt-3 g-3">
-    <div class="col-md-4" *ngFor="let b of buckets">
-      <div class="p-3 border rounded h-100">
-        <div class="small text-muted">{{ b.label }}</div>
-        <div class="h4 mt-1">{{ b.count }} items</div>
-        <div class="text-danger mt-2">₹ {{ b.total | number }}</div>
+  <!-- ✅ COLOR CATEGORY LEGEND -->
+  <!-- ✅ COLOR CATEGORY LEGEND -->
+<div class="d-flex flex-wrap gap-3 mb-4">
+
+  <span class="badge aging-recent text-white px-3 py-2">
+    0 - 7 Days (Recent)
+  </span>
+
+  <span class="badge aging-attention text-dark px-3 py-2">
+    8 - 15 Days (Attention)
+  </span>
+
+  <span class="badge aging-risk text-white px-3 py-2">
+    16 - 30 Days (Risk)
+  </span>
+
+  <span class="badge aging-critical text-white px-3 py-2">
+    31 - 60 Days (Critical)
+  </span>
+
+  <span class="badge aging-very-critical text-white px-3 py-2">
+    60+ Days (Very Critical)
+  </span>
+
+</div>
+
+
+  <!-- 📊 CHART -->
+  <div style="height:300px;">
+    <canvas id="agingChart"></canvas>
+  </div>
+
+  <!-- ✅ BUCKET CARDS -->
+  <div class="row mt-4">
+    <div class="col-md-4 mb-3" *ngFor="let b of buckets">
+      <div class="card shadow-sm border-0 h-100 aging-card" [ngClass]="getBucketClass(b.label)">
+        <div class="card-body text-center">
+          <h6 class="fw-bold">{{ b.label }}</h6>
+          <div class="display-6 fw-bold">₹{{ b.total | number }}</div>
+          <small>{{ b.count }} Pending Payments</small>
+
+          <div class="mt-3 d-grid gap-2">
+            <button class="btn btn-outline-dark btn-sm" (click)="viewDetails(b.label)">
+              👤 View Clients
+            </button>
+            <button class="btn btn-outline-danger btn-sm" (click)="sendReminder(b.label)">
+              📲 Send Reminder
+            </button>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- ✅ Export Buttons -->
+  <div class="mt-4 text-end">
+    <button class="btn btn-success me-2" (click)="exportExcel()">📊 Export Excel</button>
+    <button class="btn btn-danger me-2" (click)="exportPDF()">📄 Export PDF</button>
+    <button class="btn btn-warning" (click)="triggerAutoEmail()">📧 Email Aging Report</button>
   </div>
 </div>

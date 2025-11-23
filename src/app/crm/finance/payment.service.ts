@@ -55,4 +55,10 @@ export class PaymentService {
   return this.http.get<any[]>(`${this.baseUrl}/employee-revenue`);
 }
 
+
+getAgingBuckets() {
+  return this.http.get<any[]>(`${this.baseUrl}/aging-report`);
+}
+ 
+
 }

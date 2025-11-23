@@ -1,49 +1,107 @@
-/* 🌈 Smart Theme-Aware Card Design */
-.card {
-  background: var(--card-bg);
-  color: var(--text-color);
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color) 8%, transparent);
-  transition: 
-    background-color 0.3s ease,
-    color 0.3s ease,
-    box-shadow 0.3s ease,
-    transform 0.25s ease;
-  overflow: hidden;
+/* ===============================
+   ✅ AGING CARDS - PREMIUM WHITE TEXT
+================================ */
+
+/* 🟢 RECENT */
+.aging-recent {
+  background: linear-gradient(135deg, #2e8b57, #1f6b42) !important;
+  color: #ffffff !important;
 }
 
-/* 💫 Hover Effect */
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-color) 18%, transparent);
+/* 🟡 ATTENTION */
+.aging-attention {
+  background: linear-gradient(135deg, #d4a100, #9f7300) !important;
+  color: #ffffff !important;
 }
 
-/* 🧾 Optional Header */
-.card-header {
-  background: color-mix(in srgb, var(--accent-color) 8%, var(--card-bg));
-  border-bottom: 1px solid var(--border-color);
-  color: var(--accent-color);
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  padding: 0.75rem 1rem;
+/* 🟠 RISK */
+.aging-risk {
+  background: linear-gradient(135deg, #f57c00, #c25b00) !important;
+  color: #ffffff !important;
 }
 
-/* 🪶 Optional Body */
-.card-body {
-  padding: 1rem 1.25rem;
+/* 🔴 CRITICAL */
+.aging-critical {
+  background: linear-gradient(135deg, #c62828, #8e0000) !important;
+  color: #ffffff !important;
 }
 
-/* 🌙 Dark Mode Boost */
-[data-theme="dark"] .card {
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent-color) 20%, black);
+/* ⚫ VERY CRITICAL */
+.aging-very-critical {
+  background: linear-gradient(135deg, #2b0f14, #0f0507) !important;
+  color: #ffffff !important;
 }
 
-[data-theme="dark"] .card-header {
-  background: color-mix(in srgb, var(--accent-color) 15%, var(--card-bg));
+
+/* ✅ FORCE TEXT WHITE INSIDE */
+.aging-card h6,
+.aging-card small,
+.aging-card .display-6 {
+  color: #ffffff !important;
 }
 
-/* 🧱 Optional Accent Border Variant */
-.card.accent {
-  border-top: 4px solid var(--accent-color);
+/* ===============================
+   🌙 DARK MODE OPTIMIZATION
+================================ */
+[data-theme="dark"] .aging-recent {
+  background: linear-gradient(135deg, #1f6b42, #0e3d24) !important;
+}
+
+[data-theme="dark"] .aging-attention {
+  background: linear-gradient(135deg, #8c6a00, #5f4500) !important;
+}
+
+[data-theme="dark"] .aging-risk {
+  background: linear-gradient(135deg, #c25b00, #8a3d00) !important;
+}
+
+[data-theme="dark"] .aging-critical {
+  background: linear-gradient(135deg, #8e0000, #4a0000) !important;
+}
+
+[data-theme="dark"] .aging-very-critical {
+  background: linear-gradient(135deg, #120507, #000000) !important;
+}
+
+
+/* ✨ Elegant Hover Effect */
+.aging-card:hover {
+  box-shadow: 0 12px 26px rgba(0,0,0,0.18);
+  transform: translateY(-6px);
+  transition: all 0.25s ease;
+}
+/* ===============================
+   ✅ FORCE BUTTON TEXT WHITE
+   (Overrides Bootstrap .btn)
+================================ */
+
+.aging-card .btn {
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.6) !important;
+}
+
+/* Hover state */
+.aging-card .btn:hover {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  background: rgba(0,0,0,0.25) !important;
+}
+
+/* Outline danger fix */
+.aging-card .btn-outline-danger {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+/* Outline dark fix */
+.aging-card .btn-outline-dark {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+/* Remove Bootstrap focus glow */
+.aging-card .btn:focus,
+.aging-card .btn:active {
+  box-shadow: none !important;
+  color: #ffffff !important;
 }
